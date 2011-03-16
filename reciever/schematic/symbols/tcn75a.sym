@@ -1,0 +1,92 @@
+v 20060123 1
+B 300 300 2200 1600 3 0 0 0 -1 -1 0 -1 -1 -1 -1 -1
+T 2500 2000 9 10 0 0 0 0 1
+footprint=SO8
+T 2500 2200 9 10 0 0 0 0 1
+description=2-Wire Serial Temperature Sensor
+T 2500 2400 9 10 0 0 0 0 1
+device=TCN75A
+T 2500 2600 9 10 0 0 0 0 1
+distlicense=GPL
+T 2500 2800 9 10 0 0 0 0 1
+uselicense=unlimited
+T 2500 3000 9 10 0 0 0 0 1
+author=Gavin Hurlbut
+T 2500 3200 9 10 0 0 0 0 1
+copyright=2011 Gavin Hurlbut
+T 1400 1300 9 10 1 1 0 3 1
+TCN75A
+T 1400 900 9 10 1 1 0 3 1
+refdes=U?
+P 2800 1500 2500 1500 1 0 0
+{
+T 2450 1500 9 10 1 1 0 7 1
+pinlabel=SDA
+T 2600 1550 5 8 1 1 0 0 1
+pinnumber=1
+T 2600 1550 5 8 0 1 0 0 1
+pinseq=1
+}
+P 2800 1100 2500 1100 1 0 0
+{
+T 2450 1100 9 10 1 1 0 7 1
+pinlabel=SCL
+T 2600 1150 5 8 1 1 0 0 1
+pinnumber=2
+T 2600 1150 5 8 0 1 0 0 1
+pinseq=2
+}
+P 2800 700 2500 700 1 0 0
+{
+T 2450 700 9 10 1 1 0 7 1
+pinlabel=ALARM
+T 2600 750 5 8 1 1 0 0 1
+pinnumber=3
+T 2600 750 5 8 0 1 0 0 1
+pinseq=3
+}
+P 1400 0 1400 300 1 0 0
+{
+T 1400 350 9 10 1 1 0 3 1
+pinlabel=GND
+T 1450 250 5 8 1 1 0 2 1
+pinnumber=4
+T 1450 250 5 8 0 1 0 2 1
+pinseq=4
+}
+P 0 1500 300 1500 1 0 0
+{
+T 350 1500 9 10 1 1 0 1 1
+pinlabel=A2
+T 200 1550 5 8 1 1 0 6 1
+pinnumber=5
+T 200 1550 5 8 0 1 0 6 1
+pinseq=5
+}
+P 0 1300 300 1300 1 0 0
+{
+T 350 1300 9 10 1 1 0 1 1
+pinlabel=A1
+T 200 1350 5 8 1 1 0 6 1
+pinnumber=6
+T 200 1350 5 8 0 1 0 6 1
+pinseq=6
+}
+P 0 1100 300 1100 1 0 0
+{
+T 350 1100 9 10 1 1 0 1 1
+pinlabel=A0
+T 200 1150 5 8 1 1 0 6 1
+pinnumber=7
+T 200 1150 5 8 0 1 0 6 1
+pinseq=7
+}
+P 1400 2200 1400 1900 1 0 0
+{
+T 1400 1850 9 10 1 1 0 5 1
+pinlabel=VDD
+T 1450 1950 5 8 1 1 0 0 1
+pinnumber=8
+T 1450 1950 5 8 0 1 0 0 1
+pinseq=8
+}

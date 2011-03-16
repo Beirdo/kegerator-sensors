@@ -1,0 +1,31 @@
+[labels]
+TCN75A
+refdes=U?
+! copyright=2011 Gavin Hurlbut
+! author=Gavin Hurlbut
+! uselicense=unlimited
+! distlicense=GPL
+! device=TCN75A
+! description=2-Wire Serial Temperature Sensor
+! footprint=SO8
+
+[top]
+
+8 VDD
+
+[right]
+
+1 SDA
+2 SCL
+3 ALARM
+
+[bottom]
+
+4 GND
+
+[left]
+
+.bus
+5 A2
+6 A1
+7 A0
