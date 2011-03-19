@@ -1,0 +1,9 @@
+Refdes,Qty,Value,Digikey Part,Manufacturer,Manufacturer Part,Footprint,Description
+"CONN1,CONN2,CONN3",1,,768-1021-ND,FTDI,MM232R,,The jumper connectors come with the RS232-USB module
+CONN4,1,,SAM1034-03-ND,Samtech,TSW-103-07-T-D,6 pos 100" dual row,2x3 male header
+CONN5,1,,AE10334-ND,Assmann,AU-Y1008-2-R,custom,USB stacked dual-A connector
+"C1,C2",2,0.1uF 50V,709-1189-1-ND,Johanson Dielectric,500R15W104KV4T,0805,Capacitor Ceramic 0.1uF 50V X7R 0805
+"R1,R2,R3",3,TBD,TBD,TBD,TBD,0805,Resistor Surface Mount 0805
+U1,1,,ATMEGA128A-AU-ND,Atmel,ATMEAGA128A-AU,TQFP-64,MCU 8bit 128K ISP FLASH 64-TQFP
+U2,1,,TCN75AVOA-ND,Microchip,TCN75AVOA,SO-8,IC Temp Sensor I2C 2.7V 8SOIC
+U3,1,,DS92LV010ATM-ND,National Semiconductor,DS92LV010ATM,SO-8,IC TXRX Bus LVDS Single 8SOIC
