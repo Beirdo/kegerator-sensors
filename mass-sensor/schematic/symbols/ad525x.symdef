@@ -1,0 +1,39 @@
+[labels]
+AD5252
+refdes=U?
+! copyright=2011 Gavin Hurlbut
+! author=Gavin Hurlbut
+! uselicense=unlimited
+! distlicense=GPL
+! device=AD5252
+! description=Dual I2C Potentiometer (256 taps)
+! footprint=TSSOP14
+
+[top]
+
+1 VDD
+
+[left]
+
+.bus
+11 AD1
+2 AD0
+
+3 ! !WP
+9 SCL
+7 SDA
+10 DGND
+
+[bottom]
+
+8 VSS
+
+[right]
+
+6 A1
+4 W1
+5 B1
+
+12 A3
+14 W3
+13 B3
