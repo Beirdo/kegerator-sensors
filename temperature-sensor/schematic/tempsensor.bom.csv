@@ -1,9 +1,0 @@
-Refdes,Qty,Value,Digikey Part,Manufacturer,Manufacturer Part,Footprint,Description
-CONN1,1,,AE10334-ND,Assmann,AU-Y1008-2-R,custom,USB stacked dual-A connector
-CONN2,1,,SAM1034-03-ND,Samtech,TSW-103-07-T-D,6 pos 100" dual row,2x3 male header
-C1,1,0.1uF 50V,709-1189-1-ND,Johanson Dielectric,500R15W104KV4T,0805,Capacitor Ceramic 0.1uF 50V X7R 0805
-R1,1,TBD,TBD,TBD,TBD,0805,Resistor Surface Mount 0805
-U1,1,,DS92LV010ATM-ND,National Semiconductor,DS92LV010ATM,SO-8,IC TXRX Bus LVDS Single 8SOIC
-U2,1,,576-2748-1-ND,Micrel,MIC5211-3.3YM6 TR,SOT23-6,IC Reg VLDO Dual VCap SOT23-6
-U3,1,,ATTINY24A-SSD-ND,Atmel,ATTINY24A-SSU,SO14,MCU AVR 2k FLASH 20MHz 14SOIC
-U4,1,,SW1081CT-ND,Omron Electronics,A6H-4102-P,SO8,Switch DIP Vert 4Pos SMT
