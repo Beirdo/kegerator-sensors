@@ -1,0 +1,13 @@
++5V	CONN1-5 CONN1-1 U2-5 U2-1 
+unnamed_net10	CONN1-2 CONN1-6 U1-7 
+unnamed_net9	CONN1-7 CONN1-3 U1-6 
+GND	CONN1-8 CONN1-4 C1-1 U2-3 U2-2 U1-4 U4-7 U4-6 U4-8 U4-5 U3-14 
+unnamed_net8	U4-1 U3-13 
+unnamed_net7	U4-2 U3-12 
+unnamed_net6	U4-3 U3-11 
+unnamed_net5	U4-4 U3-10 
+unnamed_net4	U1-3 U3-5 
+unnamed_net3	U1-5 U3-4 
+unnamed_net2	U1-2 U3-3 
+unnamed_net1	U1-1 U3-2 
++3.3V	C1-2 U2-6 U1-8 U3-1 

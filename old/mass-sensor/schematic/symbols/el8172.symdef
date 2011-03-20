@@ -1,0 +1,32 @@
+[labels]
+EL8172
+refdes=U?
+! copyright=2011 Gavin Hurlbut
+! author=Gavin Hurlbut
+! uselicense=unlimited
+! distlicense=GPL
+! device=EL8172
+! description=Rail-To-Rail Instrumentation Amp
+! footprint=SO8
+
+[top]
+
+7 V+
+
+[left]
+
+2 IN-
+3 IN+
+
+5 FB-
+8 FB+
+
+[bottom]
+
+4 V-
+
+[right]
+
+6 VOUT
+
+1 NC

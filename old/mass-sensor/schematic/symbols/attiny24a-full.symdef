@@ -1,0 +1,39 @@
+[labels]
+ATtiny24A
+refdes=U?
+! copyright=2010 Gavin Hurlbut
+! author=Gavin Hurlbut
+! uselicense=unlimited
+! distlicense=GPL
+! device=ATtiny24A
+! description=microcontroller
+! footprint=SOIC-14
+
+[top]
+
+1 VCC
+
+[left]
+
+.bus
+2 PB0 (PCINT8/XTAL1/CLKI)
+3 PB1 (PCINT9/XTAL2)
+5 PB2 (PCINT10/INT0/OC0A/CKOUT)
+4 PB3 (PCINT11/!RESET/dW)
+
+[bottom]
+
+14 GND
+
+[right]
+
+.bus
+13 PA0 (ADC0/AREF/PCINT0)
+12 PA1 (ADC1/AIN0/PCINT1)
+11 PA2 (ADC2/AIN1/PCINT2)
+10 PA3 (ADC3/T0/PCINT3)
+9  PA4 (ADC4/USCK/SCL/T1/PCINT4)
+8  PA5 (ADC5/DO/MISO/OC1B/PCINT5)
+7  PA6 (ADC6/DI/MOSI/SDA/OC1A/PCINT6)
+6  PA5 (ADC7/OC0B/ICP/PCINT7)
+
