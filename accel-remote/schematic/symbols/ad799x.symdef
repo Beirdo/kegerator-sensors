@@ -1,0 +1,31 @@
+[labels]
+AD7991
+refdes=U?
+! copyright=2011 Gavin Hurlbut
+! author=Gavin Hurlbut
+! uselicense=unlimited
+! distlicense=GPL
+! device=AD7991
+! description=12-bit Quad ADC
+! footprint=SOT238
+
+[top]
+
+8 VDD
+
+[left]
+
+.bus
+3 Vin0
+4 Vin1
+5 Vin2
+6 Vin3/Vref
+
+[bottom]
+
+7 GND
+
+[right]
+
+1 SCL
+2 SDA

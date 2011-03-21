@@ -1,0 +1,42 @@
+[labels]
+ADXL335
+refdes=U?
+! copyright=2011 Gavin Hurlbut
+! author=Gavin Hurlbut
+! uselicense=unlimited
+! distlicense=GPL
+! device=ADXL335
+! description=3 Axis +/-3g Accelerometer
+! footprint=LFCSP16
+
+[top]
+
+14 Vs
+15 Vs
+
+[left]
+
+2 ST
+
+.bus
+1 NC
+4 NC
+9 NC
+11 NC
+13 NC
+16 NC
+EP NC
+
+[bottom]
+
+.bus
+3 COM
+5 COM
+6 COM
+7 COM
+
+[right]
+
+12 Xout
+10 Yout
+8 Zout
