@@ -1,0 +1,38 @@
+[labels]
+DS1374C
+refdes=U?
+! copyright=2011 Gavin Hurlbut
+! author=Gavin Hurlbut
+! uselicense=unlimited
+! distlicense=GPL
+! device=DS1374C
+! description=Real-Time Clock with trickle charge
+! footprint=SO16
+
+[top]
+
+4 VCC
+13 Vbackup
+
+[bottom]
+
+15 GND
+
+.bus
+5 NC
+6 NC
+7 NC
+8 NC
+9 NC
+10 NC
+11 NC
+12 NC
+
+[right]
+
+3 SQW
+2 \_INT\_
+14 \_RST\_
+1 SCL
+16 SDA
+
