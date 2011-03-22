@@ -1,0 +1,26 @@
+CC = avr-gcc
+OBJDUMP = avr-objdump
+
+INCS = -I /usr/lib/avr/include
+SRCS = main.c uart0.c uart1.c
+OBJS = ${SRCS:%.c=%.o}
+
+ELF  = receiver.elf
+DISS = ${SRCS:%.c=%.dis} ${ELF:%.elf=%.dis}
+
+all:	${ELF}
+
+%.o:	%.c
+	${CC} -g -O3 -mmcu=atmega128 -c $+ -o $@
+
+%.dis:	%.o
+	${OBJDUMP} -Sx $+ > $@
+
+%.dis:	%.elf
+	${OBJDUMP} -Sx $+ > $@
+
+${ELF}:	${OBJS}
+	${CC} -g -O3 -mmcu=atmega128 ${OBJS} -o $@
+
+clean:
+	${RM} ${OBJS} ${DISS} ${ELF}
