@@ -2,7 +2,7 @@ CC = avr-gcc
 OBJDUMP = avr-objdump
 
 INCS = -I /usr/lib/avr/include
-SRCS = main.c uart0.c uart1.c
+SRCS = main.c uart0.c uart1.c crc.c
 OBJS = ${SRCS:%.c=%.o}
 
 ELF  = receiver.elf

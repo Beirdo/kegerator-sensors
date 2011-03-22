@@ -9,12 +9,19 @@
 /* Externals */
 extern uint8_t sensor_address;
 
+extern uint8_t u1_tx_buf[MAX_BUF_LEN];
+extern uint8_t u1_tx_size;
+
 /* Prototypes */
 void uart0_setup(void);
 void uart0_transmit(void);
 
 void uart1_setup(void);
 void uart1_transmit(uint8_t target);
+
+uint16_t check_crc( uint8_t *buffer, uint8_t length );
+uint16_t calc_crc( uint8_t *buffer, uint8_t length );
+
 
 #endif
 
