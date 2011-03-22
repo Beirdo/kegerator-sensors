@@ -1,0 +1,8 @@
+*-gerbers.zip
+*.cmd
+*.new.pcb
+*-
+*~
+*.swp
+*.bak
+*.bak?
