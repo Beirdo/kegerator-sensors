@@ -1,8 +1,7 @@
+#include "local.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
-#include "local.h"
-
 #include <util/crc16.h>
 
 uint16_t check_crc( uint8_t *buffer, uint8_t length )

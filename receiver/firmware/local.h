@@ -1,7 +1,10 @@
 #ifndef _local_h_
 #define _local_h_
 
+#include <stdint.h>
+
 /* Macros */
+#define F_CPU 16000000
 #define MAX_BUF_LEN 32
 
 #define MIN(x,y)    ((x) < (y) ? (x) : (y))

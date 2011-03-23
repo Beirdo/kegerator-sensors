@@ -1,9 +1,9 @@
+#include "local.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 #include <stdint.h>
 #include <string.h>
-#include "local.h"
 #include <util/twi.h>
 
 typedef enum {

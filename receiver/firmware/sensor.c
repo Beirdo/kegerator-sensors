@@ -1,7 +1,7 @@
+#include "local.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
-#include "local.h"
 #include <string.h>
 
 uint8_t sensor_in_use = 0;

@@ -1,11 +1,10 @@
+#include "local.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
 #include <string.h>
-#include "local.h"
 
 /* 38400 to the PC over USB */
-#define F_CPU 16000000
 #define BAUD 38400
 #include <util/setbaud.h>
 

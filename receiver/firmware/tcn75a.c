@@ -1,7 +1,7 @@
+#include "local.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
-#include "local.h"
 
 #define TCN75A_ADDR 0x90
 

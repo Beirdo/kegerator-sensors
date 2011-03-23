@@ -1,8 +1,9 @@
+#include "local.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
+#include <util/delay.h>
 #include <stdint.h>
-#include "local.h"
 
 /* Receiver is at 0xFF */
 uint8_t sensor_address = 0xFF;
@@ -14,6 +15,8 @@ int main(void)
     uart0_setup();
     uart1_setup();
     i2c_setup();
+
+    _delay_ms(10);
 
     sei();
 
