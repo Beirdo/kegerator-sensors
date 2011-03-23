@@ -34,7 +34,7 @@ void uart1_setup(void)
     /* Setup the enables for the BLVDS part as outputs */
     DDRD |= (1 << PD5) | (1 << PD4);
 
-    /* Enable the reciever, disable transmitter */
+    /* Enable the receiver, disable transmitter */
     PORTD &= ~((1 << PD5) | (1 << PD4));
 
     u1_rx_index = 0;
@@ -104,7 +104,7 @@ ISR(SIG_UART1_TRANS)
 {
     UCSR1B &= ~(1 << TXCIE);
 
-    /* Enable the reciever, disable transmitter */
+    /* Enable the receiver, disable transmitter */
     PORTD &= ~((1 << PD5) | (1 << PD4));
 
     u1_tx_size = 0;
@@ -115,7 +115,7 @@ void uart1_transmit(uint8_t target)
     u1_tx_size = MIN(u1_tx_size, MAX_BUF_LEN);
     if( u1_tx_size )
     {
-        /* Enable the transmitter, disable reciever */
+        /* Enable the transmitter, disable receiver */
         PORTD |= (1 << PD5) | (1 << PD4);
 
         u1_tx_index = 0;
