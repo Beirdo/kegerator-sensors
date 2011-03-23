@@ -45,6 +45,7 @@ uint16_t check_crc( uint8_t *buffer, uint8_t length );
 uint16_t calc_crc( uint8_t *buffer, uint8_t length );
 
 void sensor_handle_fast(void);
+void sensor_handle(void);
 
 void tcn75a_setup(void);
 uint16_t tcn75a_read( uint8_t regnum );
