@@ -1,8 +1,10 @@
+.PHONY:	force
+
 CC = avr-gcc
 OBJDUMP = avr-objdump
 
 INCS = -I /usr/lib/avr/include
-SRCS = main.c uart0.c uart1.c crc.c
+SRCS = main.c version.c uart0.c uart1.c crc.c sensor.c tcn75a.c i2c.c
 OBJS = ${SRCS:%.c=%.o}
 
 ELF  = receiver.elf
@@ -22,5 +24,8 @@ all:	${ELF}
 ${ELF}:	${OBJS}
 	${CC} -g -O3 -mmcu=atmega128 ${OBJS} -o $@
 
+version.c:	force
+	git describe --always --dirty | ./mkversion.sh
+
 clean:
-	${RM} ${OBJS} ${DISS} ${ELF}
+	${RM} ${OBJS} ${DISS} ${ELF} version.c

@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
+#include <string.h>
 #include "local.h"
 
 /* 38400 to the sensors over BLVDS */
@@ -10,6 +11,7 @@
 
 uint8_t u1_rx_buf[MAX_BUF_LEN];
 uint8_t u1_rx_index;
+uint8_t u1_rx_size;
 uint8_t u1_tx_buf[MAX_BUF_LEN];
 uint8_t u1_tx_index;
 uint8_t u1_tx_size;
@@ -36,6 +38,8 @@ void uart1_setup(void)
 /* UART1 Rx interrupt */
 ISR(SIG_UART1_RECV)
 {
+    uint8_t byte;
+
     if( (UCSR1A & (1 << MPCM)) ) {
         /* Wait for the address */
         if( (UDR1 == sensor_address) ) {
@@ -48,11 +52,31 @@ ISR(SIG_UART1_RECV)
         /* We are in the data portion */
         if( u1_rx_index < MAX_BUF_LEN )
         {
-            u1_rx_buf[u1_rx_index++] = UDR1;
+            byte = UDR1;
+            u1_rx_buf[u1_rx_index++] = byte;
         }
     }
 
-    /* TODO: end of frame handling */
+    if( u1_rx_index == 2 )
+    {
+        u1_rx_size = MIN(byte, MAX_BUF_LEN);
+    }
+
+    if( u1_rx_index >= u1_rx_size )
+    {
+        if( check_crc( u1_rx_buf, u1_rx_size ) != 0 )
+        {
+            /* Bad CRC.  */
+        }
+        else
+        {
+            /* Good CRC. */
+            /* Transmit it to the PC over USB */
+            u0_tx_size = u1_rx_size;
+            memcpy(u0_tx_buf, u1_rx_buf, u0_tx_size);
+            uart0_transmit();
+        }
+    }
 }
 
 /* UART1 Tx Data Empty interrupt */

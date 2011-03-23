@@ -1,21 +1,13 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
+#include <string.h>
 #include "local.h"
 
 /* 38400 to the PC over USB */
 #define F_CPU 16000000
 #define BAUD 38400
 #include <util/setbaud.h>
-
-typedef struct {
-    uint8_t  address;
-    uint8_t  length;    /* From address to end of CRC16 */
-    uint8_t  get_set;
-    uint8_t  subaddress;
-    uint8_t  data[1];   /* actually of size length - 5 */
-    uint16_t crc16;
-} u0_message;
 
 uint8_t u0_rx_buf[MAX_BUF_LEN];
 uint8_t u0_rx_index;
@@ -58,7 +50,7 @@ ISR(SIG_UART0_RECV)
     if( u0_rx_index == 2 )
     {
         u0_rx_size = MIN(byte, MAX_BUF_LEN);
-        u0_rx_data_size = u0_rx_size < 5 ? 0 : u0_rx_size - 5;
+        u0_rx_data_size = u0_rx_size < 6 ? 0 : u0_rx_size - 6;
     }
 
     if( u0_rx_index >= u0_rx_size )
@@ -73,13 +65,24 @@ ISR(SIG_UART0_RECV)
             if( u0_rx_buf[0] == sensor_address )
             {
                 /* This is to this board */
+                if( u0_rx_size >= 6 ) {
+                    /* Disable RX interrupts while this runs */
+                    UCSR0B &= ~(1 << RXCIE);
+
+                    /* Hand the buffer over to the sensor handling code */
+                    sensor_handle_fast();
+                }
             }
             else
             {
                 /* Transmit it to the BLVDS */
-                u1_tx_size = u0_rx_size - 1;
-                memcpy(u1_tx_buf, &(u0_rx_buf), u1_tx_size);
-                uart1_transmit(u0_rx_buf[0]);
+                uint8_t target;
+
+                target = u0_rx_buf[0];
+                u1_tx_size = u0_rx_size;
+                u0_rx_buf[0] = sensor_address;  /* Return address */
+                memcpy(u1_tx_buf, u0_rx_buf, u1_tx_size);
+                uart1_transmit(target);
             }
         }
     }
@@ -116,6 +119,18 @@ void uart0_transmit(void)
     }
 }
 
+
+void uart0_restart_rx(void)
+{
+    uint8_t dummy;
+
+    /* Drain the RX register */
+    while( UCSR0A && (1 << RXC) )
+        dummy = UDR0;
+
+    /* Reenable RX interrupts */
+    UCSR0B |= (1 << RXCIE);
+}
 
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
