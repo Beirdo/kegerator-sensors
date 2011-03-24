@@ -82,9 +82,17 @@ uint8_t i2c_read_8bit_chained( uint8_t addr, uint8_t subaddr )
 {
     uint8_t retval;
 
+    i2c_read_buffer_chained(addr, subaddr, i2c_rx_data, 1);
+    retval = i2c_rx_data[0];
+    return( retval );
+}
+
+void i2c_read_buffer_chained( uint8_t addr, uint8_t subaddr, uint8_t *buffer,
+                              uint8_t bytes )
+{
     i2c_tx_data[0] = subaddr;
     i2c_tx_size = 1;
-    i2c_rx_size = 1;
+    i2c_rx_size = bytes;
 
     i2c_mode = TW_MASTER_TX;
     i2c_state = I2C_START;
@@ -98,15 +106,15 @@ uint8_t i2c_read_8bit_chained( uint8_t addr, uint8_t subaddr )
         sleep_mode();
     }
 
-    retval = i2c_rx_data[0];
-    return( retval );
+    if( buffer != i2c_rx_data )
+        memcpy( buffer, i2c_rx_data, bytes );
 }
 
 uint8_t i2c_read_8bit( uint8_t addr )
 {
     uint8_t retval;
 
-    i2c_read_buffer(addr, 1);
+    i2c_read_buffer(addr, i2c_rx_data, 1);
     retval = i2c_rx_data[0];
     return( retval );
 }
@@ -115,12 +123,12 @@ uint16_t i2c_read_16bit( uint8_t addr )
 {
     uint16_t retval;
 
-    i2c_read_buffer(addr, 2);
+    i2c_read_buffer(addr, i2c_rx_data, 2);
     retval = (i2c_rx_data[0] << 8) | i2c_rx_data[1];
     return( retval );
 }
 
-void i2c_read_buffer( uint8_t addr, uint8_t bytes )
+void i2c_read_buffer( uint8_t addr, uint8_t *buffer, uint8_t bytes )
 {
     i2c_mode = TW_MASTER_RX;
     i2c_state = I2C_START;
@@ -134,6 +142,9 @@ void i2c_read_buffer( uint8_t addr, uint8_t bytes )
     {
         sleep_mode();
     }
+
+    if( buffer != i2c_rx_data )
+        memcpy( buffer, i2c_rx_data, bytes );
 }
 
 void i2c_master_tx_do_state(void)

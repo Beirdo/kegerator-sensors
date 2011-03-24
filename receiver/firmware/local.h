@@ -57,8 +57,12 @@ void i2c_setup(void);
 void i2c_write_8bit( uint8_t addr, uint8_t data );
 void i2c_write_16bit( uint8_t addr, uint16_t data );
 void i2c_write_buffer( uint8_t addr, uint8_t *buffer, uint8_t bytes );
+uint8_t i2c_read_8bit( uint8_t addr );
 uint16_t i2c_read_16bit( uint8_t addr );
-void i2c_read_buffer( uint8_t addr, uint8_t bytes );
+uint8_t i2c_read_8bit_chained( uint8_t addr, uint8_t subaddr );
+void i2c_read_buffer_chained( uint8_t addr, uint8_t subaddr, uint8_t *buffer,
+                              uint8_t bytes );
+void i2c_read_buffer( uint8_t addr, uint8_t *buffer, uint8_t bytes );
 
 #endif
 
