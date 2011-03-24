@@ -16,9 +16,6 @@ FUSES =
 };
 
 
-/* Receiver is at 0xFF */
-uint8_t sensor_address = 0xFF;
-
 int main(void) __attribute__((noreturn));
 
 int main(void)

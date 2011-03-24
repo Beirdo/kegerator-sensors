@@ -10,6 +10,7 @@ uint8_t sensor_address;
 uint8_t sensor_in_use = 0;
 uint8_t sensor_buf[MAX_BUF_LEN];
 uint8_t sensor_size;
+uint8_t sensor_type[] = "mass";
 
 void sensor_setup(void)
 {
@@ -35,6 +36,7 @@ void sensor_handle(void)
 {
     message *msg;
     uint16_t crc;
+    uint8_t  offset;
 
     sensor_in_use = 0;
 
@@ -103,9 +105,14 @@ void sensor_handle(void)
         switch( msg->subaddress )
         {
             case 0:     /* Firmware version */
-                u_tx_size = 6 + strlen(sensor_fw_version);
+                u_tx_size = 7 + strlen(sensor_fw_version) + 
+                            strlen(sensor_type);
                 memcpy(u_tx_buf, sensor_buf, 4);
-                memcpy(&(u_tx_buf[4]), sensor_fw_version, 
+                offset = 4;
+                memcpy(&(u_tx_buf[offset]), sensor_type, strlen(sensor_type));
+                offset += strlen(sensor_type);
+                u_tx_buf[offset++] = ' ';
+                memcpy(&(u_tx_buf[offset]), sensor_fw_version, 
                        strlen(sensor_fw_version));
                 break;
             case 1:     /* Mass in g via ADC */
