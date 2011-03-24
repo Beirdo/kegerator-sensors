@@ -2,8 +2,18 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
+#include <avr/signature.h>
+#include <avr/fuse.h>
 #include <util/delay.h>
 #include <stdint.h>
+
+FUSES =
+{
+    .low = (FUSE_CKSEL3 & FUSE_CKSEL1 & FUSE_CKSEL0 & FUSE_SUT1 & FUSE_SUT0 &
+            FUSE_BODEN),
+    .high = HFUSE_DEFAULT,
+};
+
 
 int main(void) __attribute__((noreturn));
 

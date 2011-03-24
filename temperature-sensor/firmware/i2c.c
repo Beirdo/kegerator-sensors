@@ -39,7 +39,7 @@ uint8_t i2c_twcr_val;
 void i2c_setup(void)
 {
     TWSR = 0;       /* No prescaling, please */
-    TWBR = 3;       /* 400kHz I2C clock */
+    TWBR = 8;       /* 100kHz I2C clock */
     i2c_twcr_val = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
 }
 
@@ -68,6 +68,7 @@ void i2c_write_buffer( uint8_t addr, uint8_t *buffer, uint8_t bytes )
     i2c_mode = TW_MASTER_TX;
     i2c_state = I2C_START;
     i2c_slaveaddr = addr;
+    i2c_chain = 0;
 
     TWCR = i2c_twcr_val | (1 << TWSTA);
 
@@ -75,6 +76,39 @@ void i2c_write_buffer( uint8_t addr, uint8_t *buffer, uint8_t bytes )
     {
         sleep_mode();
     }
+}
+
+uint8_t i2c_read_8bit_chained( uint8_t addr, uint8_t subaddr )
+{
+    uint8_t retval;
+
+    i2c_tx_data[0] = subaddr;
+    i2c_tx_size = 1;
+    i2c_rx_size = 1;
+
+    i2c_mode = TW_MASTER_TX;
+    i2c_state = I2C_START;
+    i2c_slaveaddr = addr;
+    i2c_chain = 1;
+
+    TWCR = i2c_twcr_val | (1 << TWSTA);
+
+    while( i2c_state != I2C_DONE && i2c_state != I2C_ERROR )
+    {
+        sleep_mode();
+    }
+
+    retval = i2c_rx_data[0];
+    return( retval );
+}
+
+uint8_t i2c_read_8bit( uint8_t addr )
+{
+    uint8_t retval;
+
+    i2c_read_buffer(addr, 1);
+    retval = i2c_rx_data[0];
+    return( retval );
 }
 
 uint16_t i2c_read_16bit( uint8_t addr )
