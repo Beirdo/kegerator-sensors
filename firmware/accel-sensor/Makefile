@@ -5,8 +5,9 @@ OBJDUMP = avr-objdump
 CPU = atmega8
 
 INCS = -I . -I ../common
-COMMONSRCS = ../common/crc.c ../common/sensor-uart.c ../common/i2c.c
-SRCS = main.c version.c sensor.c ad7991.c ds1374.c
+COMMONSRCS  = ../common/main.c ../common/crc.c ../common/sensor-uart.c
+COMMONSRCS += ../common/i2c.c
+SRCS = version.c sensor.c ad7991.c ds1374.c
 OBJS = ${COMMONSRCS:../common/%.c=%.o} ${SRCS:%.c=%.o}
 
 ELF  = accelerometer_sensor.elf

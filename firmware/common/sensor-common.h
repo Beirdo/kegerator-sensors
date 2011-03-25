@@ -13,7 +13,6 @@ extern uint8_t u_tx_buf[MAX_BUF_LEN];
 extern uint8_t u_tx_size;
 
 /* Prototypes */
-void uart_setup(void);
 void uart_transmit(uint8_t target);
 void uart_restart_rx(void);
 

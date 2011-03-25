@@ -5,8 +5,9 @@ OBJDUMP = avr-objdump
 CPU = atmega128
 
 INCS = -I . -I ../common
-COMMONSRCS = ../common/crc.c ../common/i2c.c ../common/tcn75a.c
-SRCS = main.c version.c uart0.c uart1.c sensor.c
+COMMONSRCS  = ../common/main.c ../common/crc.c ../common/i2c.c 
+COMMONSRCS += ../common/tcn75a.c
+SRCS = version.c uart0.c uart1.c sensor.c
 OBJS = ${COMMONSRCS:../common/%.c=%.o} ${SRCS:%.c=%.o}
 
 ELF  = receiver.elf

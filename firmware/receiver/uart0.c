@@ -17,6 +17,12 @@ uint8_t u0_tx_buf[MAX_BUF_LEN];
 uint8_t u0_tx_index;
 uint8_t u0_tx_size;
 
+void uart_setup(void)
+{
+    uart0_setup();
+    uart1_setup();
+}
+
 void uart0_setup(void)
 {
     UBRR0H = UBRRH_VALUE;

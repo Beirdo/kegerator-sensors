@@ -12,6 +12,15 @@ uint8_t sensor_size;
 uint8_t sensor_data_size;
 uint8_t sensor_type[] = "receiver";
 
+void sensor_main_setup(void)
+{
+}
+
+void sensor_local_setup(void)
+{
+    tcn75a_setup();
+}
+
 void sensor_handle_fast(void)
 {
     memcpy(sensor_buf, u0_rx_buf, u0_rx_size);

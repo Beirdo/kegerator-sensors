@@ -12,7 +12,7 @@ uint8_t sensor_buf[MAX_BUF_LEN];
 uint8_t sensor_size;
 uint8_t sensor_type[] = "mass";
 
-void sensor_setup(void)
+void sensor_main_setup(void)
 {
     /* Make the DIP switch bits (PD7-4) inputs, pull up resistor enabled */
     DDRD  &= 0x0F;
@@ -23,6 +23,11 @@ void sensor_setup(void)
 
     /* Read the DIP switch */
     sensor_address = PIND >> 4;
+}
+
+void sensor_local_setup(void)
+{
+    ad5252_setup();
 }
 
 void sensor_handle_fast(void)
