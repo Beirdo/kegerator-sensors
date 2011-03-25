@@ -2,18 +2,23 @@
 
 CC = avr-gcc
 OBJDUMP = avr-objdump
+CPU = atmega8
 
-INCS = -I /usr/lib/avr/include
-SRCS = main.c version.c uart.c crc.c sensor.c ad7991.c ds1374.c i2c.c
-OBJS = ${SRCS:%.c=%.o}
+INCS = -I . -I ../common
+COMMONSRCS = ../common/crc.c ../common/sensor-uart.c ../common/i2c.c
+SRCS = main.c version.c sensor.c ad7991.c ds1374.c
+OBJS = ${COMMONSRCS:../common/%.c=%.o} ${SRCS:%.c=%.o}
 
 ELF  = accelerometer_sensor.elf
-DISS = ${SRCS:%.c=%.dis} ${ELF:%.elf=%.dis}
+DISS = ${OBJS:%.o=%.dis} ${ELF:%.elf=%.dis}
 
 all:	${ELF}
 
+%.o:	../common/%.c
+	${CC} -g -O3 -mmcu=${CPU} ${INCS} -c $+ -o $@
+
 %.o:	%.c
-	${CC} -g -O3 -mmcu=atmega8 -c $+ -o $@
+	${CC} -g -O3 -mmcu=${CPU} ${INCS} -c $+ -o $@
 
 %.dis:	%.o
 	${OBJDUMP} -Sx $+ > $@
@@ -22,10 +27,10 @@ all:	${ELF}
 	${OBJDUMP} -Sx $+ > $@
 
 ${ELF}:	${OBJS}
-	${CC} -g -O3 -mmcu=atmega8 ${OBJS} -o $@
+	${CC} -g -O3 -mmcu=${CPU} ${OBJS} -o $@
 
 version.c:	force
-	git describe --always --dirty | ./mkversion.sh
+	git describe --always --dirty | ../common/mkversion.sh
 
 clean:
 	${RM} ${OBJS} ${DISS} ${ELF} version.c
