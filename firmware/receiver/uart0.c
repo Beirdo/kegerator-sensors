@@ -8,14 +8,13 @@
 #define BAUD 38400
 #include <util/setbaud.h>
 
-uint8_t u0_rx_buf[MAX_BUF_LEN];
-uint8_t u0_rx_index;
-uint8_t u0_rx_size;
-uint8_t u0_rx_data_size;
+uint8_t u_rx_buf[MAX_BUF_LEN];
+uint8_t u_rx_index;
+uint8_t u_rx_size;
 
-uint8_t u0_tx_buf[MAX_BUF_LEN];
-uint8_t u0_tx_index;
-uint8_t u0_tx_size;
+uint8_t u_tx_buf[MAX_BUF_LEN];
+uint8_t u_tx_index;
+uint8_t u_tx_size;
 
 void uart_setup(void)
 {
@@ -36,9 +35,9 @@ void uart0_setup(void)
     UCSR0B = (1 << RXCIE) | (1 << RXEN) | (1 << TXEN);
     UCSR0C = (3 << UCSZ0);                  /* N81 */
 
-    u0_rx_index = 0;
-    u0_rx_size  = MAX_BUF_LEN;
-    u0_tx_index = 0;
+    u_rx_index = 0;
+    u_rx_size  = MAX_BUF_LEN;
+    u_tx_index = 0;
 }
 
 /* UART0 Rx interrupt */
@@ -46,31 +45,30 @@ ISR(SIG_UART0_RECV)
 {
     uint8_t byte;
 
-    if( u0_rx_index >= u0_rx_size )
+    if( u_rx_index >= u_rx_size )
         return;
 
     byte = UDR0;
-    u0_rx_buf[u0_rx_index++] = byte;
+    u_rx_buf[u_rx_index++] = byte;
 
-    if( u0_rx_index == 2 )
+    if( u_rx_index == 2 )
     {
-        u0_rx_size = MIN(byte, MAX_BUF_LEN);
-        u0_rx_data_size = u0_rx_size < 6 ? 0 : u0_rx_size - 6;
+        u_rx_size = MIN(byte, MAX_BUF_LEN);
     }
 
-    if( u0_rx_index >= u0_rx_size )
+    if( u_rx_index >= u_rx_size )
     {
-        if( check_crc( u0_rx_buf, u0_rx_size ) != 0 )
+        if( check_crc( u_rx_buf, u_rx_size ) != 0 )
         {
             /* Bad CRC.  */
         }
         else
         {
             /* Good CRC. */
-            if( u0_rx_buf[0] == sensor_address )
+            if( u_rx_buf[0] == sensor_address )
             {
                 /* This is to this board */
-                if( u0_rx_size >= 6 ) {
+                if( u_rx_size >= 6 ) {
                     /* Disable RX interrupts while this runs */
                     UCSR0B &= ~(1 << RXCIE);
 
@@ -83,10 +81,10 @@ ISR(SIG_UART0_RECV)
                 /* Transmit it to the BLVDS */
                 uint8_t target;
 
-                target = u0_rx_buf[0];
-                u1_tx_size = u0_rx_size;
-                u0_rx_buf[0] = sensor_address;  /* Return address */
-                memcpy(u1_tx_buf, u0_rx_buf, u1_tx_size);
+                target = u_rx_buf[0];
+                u1_tx_size = u_rx_size;
+                u_rx_buf[0] = sensor_address;  /* Return address */
+                memcpy(u1_tx_buf, u_rx_buf, u1_tx_size);
                 uart1_transmit(target);
             }
         }
@@ -96,13 +94,13 @@ ISR(SIG_UART0_RECV)
 /* UART0 Tx Data Empty interrupt */
 ISR(SIG_UART0_DATA)
 {
-    if( u0_tx_index == u0_tx_size )
+    if( u_tx_index == u_tx_size )
     {
         UCSR0B &= ~(1 << UDRIE);
     }
     else
     {
-        UDR0 = u0_tx_buf[u0_tx_index++];
+        UDR0 = u_tx_buf[u_tx_index++];
     }
 }
 
@@ -110,22 +108,24 @@ ISR(SIG_UART0_DATA)
 ISR(SIG_UART0_TRANS)
 {
     UCSR0B &= ~(1 << TXCIE);
-    u0_tx_size = 0;
+    u_tx_size = 0;
 }
 
-void uart0_transmit(void)
+void uart_transmit(uint8_t target)
 {
-    u0_tx_size = MIN(u0_tx_size, MAX_BUF_LEN);
-    if( u0_tx_size )
+    (void)target;
+
+    u_tx_size = MIN(u_tx_size, MAX_BUF_LEN);
+    if( u_tx_size )
     {
-        u0_tx_index = 1;
-        UDR0 = u0_tx_buf[0];
+        u_tx_index = 1;
+        UDR0 = u_tx_buf[0];
         UCSR0B |= (1 << TXCIE) | (1 << UDRIE);
     }
 }
 
 
-void uart0_restart_rx(void)
+void uart_restart_rx(void)
 {
     uint8_t dummy;
 

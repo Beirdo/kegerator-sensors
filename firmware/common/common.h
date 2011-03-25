@@ -24,17 +24,31 @@ typedef struct {
 extern uint8_t sensor_address;
 extern uint8_t sensor_in_use;
 extern uint8_t sensor_fw_version[MAX_BUF_LEN];
+extern uint8_t sensor_buf[MAX_BUF_LEN];
+extern uint8_t sensor_size;
+
+extern uint8_t u_rx_buf[MAX_BUF_LEN];
+extern uint8_t u_rx_size;
+
+extern uint8_t u_tx_buf[MAX_BUF_LEN];
+extern uint8_t u_tx_size;
 
 /* Prototypes */
 void uart_setup(void);
+void uart_transmit(uint8_t target);
+void uart_restart_rx(void);
 
 uint16_t check_crc( uint8_t *buffer, uint8_t length );
 uint16_t calc_crc( uint8_t *buffer, uint8_t length );
 
 void sensor_main_setup(void);
+void sensor_common_setup(void);
 void sensor_local_setup(void);
 void sensor_handle(void);
 void sensor_handle_fast(void);
+uint8_t sensor_handle_set( message *msg );
+uint8_t sensor_handle_get( message *msg );
+
 
 void i2c_setup(void);
 void i2c_write_8bit( uint8_t addr, uint8_t data );

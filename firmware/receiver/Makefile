@@ -6,8 +6,8 @@ CPU = atmega128
 
 INCS = -I . -I ../common
 COMMONSRCS  = ../common/main.c ../common/crc.c ../common/i2c.c 
-COMMONSRCS += ../common/tcn75a.c
-SRCS = version.c uart0.c uart1.c sensor.c
+COMMONSRCS += ../common/tcn75a.c ../common/sensor.c
+SRCS = local.c version.c uart0.c uart1.c
 OBJS = ${COMMONSRCS:../common/%.c=%.o} ${SRCS:%.c=%.o}
 
 ELF  = receiver.elf

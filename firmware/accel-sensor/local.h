@@ -2,7 +2,6 @@
 #define _local_h_
 
 #include "common.h"
-#include "sensor-common.h"
 
 typedef struct {
     uint16_t x;

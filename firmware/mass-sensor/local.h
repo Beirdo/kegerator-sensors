@@ -2,7 +2,6 @@
 #define _local_h_
 
 #include "common.h"
-#include "sensor-common.h"
 #include <avr/eeprom.h>
 
 /* Macros */

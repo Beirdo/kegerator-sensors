@@ -77,9 +77,9 @@ ISR(SIG_UART1_RECV)
         {
             /* Good CRC. */
             /* Transmit it to the PC over USB */
-            u0_tx_size = u1_rx_size;
-            memcpy(u0_tx_buf, u1_rx_buf, u0_tx_size);
-            uart0_transmit();
+            u_tx_size = u1_rx_size;
+            memcpy(u_tx_buf, u1_rx_buf, u_tx_size);
+            uart_transmit(0xFF);
         }
     }
 }

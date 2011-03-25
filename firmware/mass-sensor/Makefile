@@ -6,8 +6,8 @@ CPU = atmega8
 
 INCS = -I . -I ../common
 COMMONSRCS  = ../common/main.c ../common/crc.c ../common/sensor-uart.c 
-COMMONSRCS += ../common/i2c.c
-SRCS = version.c sensor.c ad5252.c adc.c
+COMMONSRCS += ../common/i2c.c ../common/sensor.c
+SRCS = local.c version.c ad5252.c adc.c
 OBJS = ${COMMONSRCS:../common/%.c=%.o} ${SRCS:%.c=%.o}
 
 ELF  = mass_sensor.elf
