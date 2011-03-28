@@ -27,14 +27,16 @@ uint8_t sensor_handle_get( message *msg )
     switch( msg->subaddress )
     {
         case 0:     /* Firmware version */
-            u_tx_size = 7 + strlen(sensor_fw_version) + strlen(sensor_type);
+            u_tx_size = 7 + strlen((char *)sensor_fw_version) + 
+                        strlen((char *)sensor_type);
             memcpy(u_tx_buf, sensor_buf, 4);
             offset = 4;
-            memcpy(&(u_tx_buf[offset]), sensor_type, strlen(sensor_type));
-            offset += strlen(sensor_type);
+            memcpy(&(u_tx_buf[offset]), sensor_type, 
+                   strlen((char *)sensor_type));
+            offset += strlen((char *)sensor_type);
             u_tx_buf[offset++] = ' ';
             memcpy(&(u_tx_buf[offset]), sensor_fw_version, 
-                   strlen(sensor_fw_version));
+                   strlen((char *)sensor_fw_version));
             break;
         case 1:     /* Temperature sensor over I2C */
             u_tx_size = 8;

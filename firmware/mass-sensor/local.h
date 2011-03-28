@@ -18,6 +18,7 @@ extern uint16_t adc_inverse_slope;
 extern uint16_t adc_tare_grams;
 
 /* Prototypes */
+void adc_setup(void);
 uint16_t adc_read(void);
 
 void ad5252_setup(void);

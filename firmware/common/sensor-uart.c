@@ -43,7 +43,7 @@ void uart_setup(void)
 /* UART Rx interrupt */
 ISR(SIG_UART_RECV)
 {
-    uint8_t byte;
+    uint8_t byte = 0;
 
     if( (UCSRA & (1 << MPCM)) ) {
         /* Wait for the address */
