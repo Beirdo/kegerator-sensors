@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=`cat -`
+VERSION=`git describe --always --dirty`
 
 cat > version.c <<EOF
 #include "local.h"

@@ -62,7 +62,7 @@ efuse.txt:	fuses.dis
 	../common/extract-fuse.sh 3 < $+ > $@
 
 version.c:	force
-	git describe --always --dirty | ../common/mkversion.sh
+	../common/mkversion.sh
 
 clean:
 	${RM} ${OBJS} ${DISS} ${ELF} version.c ${HEX} eeprom.bin \
@@ -72,7 +72,7 @@ program:	${HEX} ${FUSES}
 	if [ -s eeprom.bin ] ; then \
 		avrdude ${AVRDUDEOPTS} -U flash:w:flash.hex:i \
 			-U eeprom:w:eeprom.hex:i ; \
-	else
+	else \
 		avrdude ${AVRDUDEOPTS} -U flash:w:flash.hex:i ; \
 	fi
 
