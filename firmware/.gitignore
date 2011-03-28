@@ -3,4 +3,6 @@
 *.o
 *.elf
 *.dis
+eeprom.bin
+?fuse.txt
 version.c

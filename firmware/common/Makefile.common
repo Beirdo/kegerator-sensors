@@ -3,10 +3,12 @@
 CC = avr-gcc
 OBJDUMP = avr-objdump
 OBJCOPY = avr-objcopy
+AVRDUDE = avrdude
 
 INCS = -I . -I ../common
 LDFLAGS = -Wl,-Map,${MAP}
 CFLAGS = -g -O3 -Wall -Werror -mmcu=${CPU}
+AVRDUDEOPTS = -c buspirate -P /dev/buspirate -p ${PROGCPU} -v
 
 OBJS = ${COMMONSRCS:../common/%.c=%.o} ${SRCS:%.c=%.o}
 
@@ -14,14 +16,23 @@ ELF  = ${PRG}.elf
 MAP  = ${PRG}.map
 DISS = ${OBJS:%.o=%.dis} ${ELF:%.elf=%.dis}
 HEX  = flash.hex eeprom.hex
+FUSES = lfuse.txt hfuse.txt efuse.txt
 
-all:	${HEX}
+all:	${HEX} ${FUSES}
 
 flash.hex:	${ELF}
 	${OBJCOPY} -j .text -j .data -O ihex $+ $@
 	
 eeprom.hex:	${ELF}
-	${OBJCOPY} -j .eeprom --change-section-lma .eeprom=0 -O ihex $+ $@
+	${OBJCOPY} -j .eeprom --change-section-lma .eeprom=0 -O binary $+ \
+		eeprom.bin 
+	if [ -s eeprom.bin ] ; then \
+		${OBJCOPY} -j .eeprom --change-section-lma .eeprom=0 -O ihex \
+			$+ $@ ; \
+	else \
+		cat /dev/null > $@ ; \
+	fi
+
 
 %.o:	../common/%.c
 	${CC} ${CFLAGS} ${INCS} -c $+ -o $@
@@ -38,8 +49,38 @@ eeprom.hex:	${ELF}
 ${ELF}:	${OBJS}
 	${CC} ${CFLAGS} ${LDFLAGS} $^ -o $@
 
+fuses.dis:	${ELF}
+	${OBJDUMP} -S -j .fuse $+ > $@
+
+lfuse.txt:	fuses.dis
+	../common/extract-fuse.sh 1 < $+ > $@
+
+hfuse.txt:	fuses.dis
+	../common/extract-fuse.sh 2 < $+ > $@
+
+efuse.txt:	fuses.dis
+	../common/extract-fuse.sh 3 < $+ > $@
+
 version.c:	force
 	git describe --always --dirty | ../common/mkversion.sh
 
 clean:
-	${RM} ${OBJS} ${DISS} ${ELF} version.c ${HEX} ${MAP}
+	${RM} ${OBJS} ${DISS} ${ELF} version.c ${HEX} eeprom.bin \
+		${MAP} ${FUSES} fuses.dis
+
+program:	${HEX} ${FUSES}
+	if [ -s eeprom.bin ] ; then \
+		avrdude ${AVRDUDEOPTS} -U flash:w:flash.hex:i \
+			-U eeprom:w:eeprom.hex:i ; \
+	else
+		avrdude ${AVRDUDEOPTS} -U flash:w:flash.hex:i ; \
+	fi
+
+program-fuses:
+	if [ -s efuse.txt ] ; then \
+		avrdude ${AVRDUDEOPTS} -u -U lfuse:w:lfuse.txt:h \
+			-U hfuse:w:hfuse.txt:h -U efuse:w:efuse.txt:h ; \
+	else \
+		avrdude ${AVRDUDEOPTS} -u -U lfuse:w:lfuse.txt:h \
+			-U hfuse:w:hfuse.txt:h ; \
+	fi

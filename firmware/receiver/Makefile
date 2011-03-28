@@ -1,4 +1,5 @@
 CPU = atmega128
+PROGCPU = m128
 PRG = receiver
 
 COMMONSRCS  = ../common/main.c ../common/crc.c ../common/i2c.c 
