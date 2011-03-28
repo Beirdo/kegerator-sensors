@@ -5,3 +5,33 @@ are being made by batchpcb.com.  Almost all parts purchased from digikey.com.
 
 I will add bill of materials, etc later as time allows.
 
+The firmware for the sensors and receiver uses the gcc-avr and avr-libc
+packages for building, and avrdude for programming (with a buspirate
+programmer).
+
+In ubuntu, you will need the following debs:
+
+For firmware:
+avr-libc
+avrdude
+avrdude-doc
+binutils-avr
+gcc-avr
+gdb-avr
+simulavr
+
+For schematic/circuit board:
+geda
+geda-doc
+geda-examples
+geda-gattrib
+geda-gnetlist
+geda-gschem
+geda-gsymcheck
+geda-symbols
+geda-utils
+gerbv
+pcb
+pcb-common
+pcb-gtk
+zip
