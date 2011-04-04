@@ -68,6 +68,9 @@ clean:
 	${RM} ${OBJS} ${DISS} ${ELF} version.c ${HEX} eeprom.bin \
 		${MAP} ${FUSES} fuses.dis
 
+program-check:
+	avrdude ${AVRDUDEOPTS}
+
 program:	${HEX} ${FUSES}
 	if [ -s eeprom.bin ] ; then \
 		avrdude ${AVRDUDEOPTS} -U flash:w:flash.hex:i \
@@ -78,9 +81,10 @@ program:	${HEX} ${FUSES}
 
 program-fuses:
 	if [ -s efuse.txt ] ; then \
-		avrdude ${AVRDUDEOPTS} -u -U lfuse:w:lfuse.txt:h \
-			-U hfuse:w:hfuse.txt:h -U efuse:w:efuse.txt:h ; \
+		avrdude ${AVRDUDEOPTS} -u -U lfuse:w:0x`cat lfuse.txt`:m \
+			-u -U hfuse:w:0x`cat hfuse.txt`:m \
+			-u -U efuse:w:0x`cat efuse.txt`:m ; \
 	else \
-		avrdude ${AVRDUDEOPTS} -u -U lfuse:w:lfuse.txt:h \
-			-U hfuse:w:hfuse.txt:h ; \
+		avrdude ${AVRDUDEOPTS} -u -U lfuse:w:0x`cat lfuse.txt`:m \
+			-u -U hfuse:w:0x`cat hfuse.txt`:m ; \
 	fi
