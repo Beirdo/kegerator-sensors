@@ -3,6 +3,7 @@
 *.o
 *.elf
 *.dis
+flash.bin
 eeprom.bin
 ?fuse.txt
 version.c
