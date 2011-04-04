@@ -1,0 +1,10 @@
+The host-side hardware is targeted to an ARM9TDMI board with a 3.5" touchscreen
+LCD.  It can be found at:
+
+	http://www.andahammer.com/mini35-sdk/
+
+This board will be running Linux, and a cross-compiler suite was generated
+using crosstool-ng which can be found at:
+
+	http://ymorin.is-a-geek.org/download/crosstool-ng/
+
