@@ -16,16 +16,16 @@ typedef struct {
     uint8_t  length;    /* From address to end of CRC16 */
     uint8_t  get_set;   /* 1 = set, 0 = get */
     uint8_t  subaddress;
-    uint8_t  data[1];   /* actually of size length - 5 */
+    uint8_t  data[1];   /* actually of size length - 6 */
     uint16_t crc16;
 } message;
 
 /* Externals */
 extern uint8_t sensor_address;
-extern uint8_t sensor_in_use;
+extern volatile uint8_t sensor_in_use;
 extern uint8_t sensor_fw_version[MAX_BUF_LEN];
-extern uint8_t sensor_buf[MAX_BUF_LEN];
-extern uint8_t sensor_size;
+extern volatile uint8_t sensor_buf[MAX_BUF_LEN];
+extern volatile uint8_t sensor_size;
 
 extern uint8_t u_rx_buf[MAX_BUF_LEN];
 extern uint8_t u_rx_size;
