@@ -29,7 +29,7 @@ uint8_t sensor_handle_get( message *msg )
         case 0:     /* Firmware version */
             u_tx_size = 7 + strlen((char *)sensor_fw_version) + 
                         strlen((char *)sensor_type);
-            memcpy(u_tx_buf, sensor_buf, 4);
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             offset = 4;
             memcpy(&(u_tx_buf[offset]), sensor_type, 
                    strlen((char *)sensor_type));
@@ -40,7 +40,7 @@ uint8_t sensor_handle_get( message *msg )
             break;
         case 1:     /* Temperature sensor over I2C */
             u_tx_size = 8;
-            memcpy(u_tx_buf, sensor_buf, 4);
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             *(uint16_t *)&(u_tx_buf[4]) = tcn75a_read(0);
             break;
         default:

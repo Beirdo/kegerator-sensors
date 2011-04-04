@@ -6,9 +6,9 @@
 #include <string.h>
 
 uint8_t sensor_address;
-uint8_t sensor_in_use = 0;
-uint8_t sensor_buf[MAX_BUF_LEN];
-uint8_t sensor_size;
+volatile uint8_t sensor_in_use = 0;
+volatile uint8_t sensor_buf[MAX_BUF_LEN];
+volatile uint8_t sensor_size;
 
 void sensor_common_setup(void)
 {
@@ -25,7 +25,7 @@ void sensor_common_setup(void)
 
 void sensor_handle_fast(void)
 {
-    memcpy(sensor_buf, u_rx_buf, u_rx_size);
+    memcpy((uint8_t *)sensor_buf, u_rx_buf, u_rx_size);
     sensor_size = u_rx_size;
     sensor_in_use = 1;
 }
@@ -53,7 +53,7 @@ void sensor_handle(void)
     u_tx_buf[1] = u_tx_size;
     memset(&(u_tx_buf[u_tx_size-2]), 0x00, 2);
 
-    crc = calc_crc( u_tx_buf, u_tx_size );
+    crc = calc_crc( u_tx_buf, u_tx_size-2 );
 
     *(uint16_t *)&(u_tx_buf[u_tx_size-2]) = crc;
 
