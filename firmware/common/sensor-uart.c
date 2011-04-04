@@ -54,10 +54,11 @@ ISR(SIG_UART_RECV)
     }
     else
     {
+        byte = UDR;
+
         /* We are in the data portion */
         if( u_rx_index < MAX_BUF_LEN )
         {
-            byte = UDR;
             u_rx_buf[u_rx_index++] = byte;
         }
     }
@@ -85,6 +86,7 @@ ISR(SIG_UART_RECV)
                 sensor_handle_fast();
             }
         }
+        u_rx_index = 0;
     }
 }
 
@@ -135,6 +137,8 @@ void uart_restart_rx(void)
     /* Drain the RX register */
     while( UCSRA && (1 << RXC) )
         dummy = UDR;
+
+    u_rx_index = 0;
 
     /* Reenable RX interrupts */
     UCSRB |= (1 << RXCIE);

@@ -54,10 +54,11 @@ ISR(SIG_UART1_RECV)
     }
     else
     {
+        byte = UDR1;
+
         /* We are in the data portion */
         if( u1_rx_index < MAX_BUF_LEN )
         {
-            byte = UDR1;
             u1_rx_buf[u1_rx_index++] = byte;
         }
     }
@@ -81,6 +82,7 @@ ISR(SIG_UART1_RECV)
             memcpy(u_tx_buf, u1_rx_buf, u_tx_size);
             uart_transmit(0xFF);
         }
+        u1_rx_index = 0;
     }
 }
 

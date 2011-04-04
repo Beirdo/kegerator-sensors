@@ -45,10 +45,10 @@ ISR(SIG_UART0_RECV)
 {
     uint8_t byte;
 
+    byte = UDR0;
     if( u_rx_index >= u_rx_size )
         return;
 
-    byte = UDR0;
     u_rx_buf[u_rx_index++] = byte;
 
     if( u_rx_index == 2 )
@@ -87,6 +87,7 @@ ISR(SIG_UART0_RECV)
                 memcpy(u1_tx_buf, u_rx_buf, u1_tx_size);
                 uart1_transmit(target);
             }
+            u_rx_index = 0;
         }
     }
 }
@@ -132,6 +133,8 @@ void uart_restart_rx(void)
     /* Drain the RX register */
     while( UCSR0A && (1 << RXC) )
         dummy = UDR0;
+
+    u_rx_index = 0;
 
     /* Reenable RX interrupts */
     UCSR0B |= (1 << RXCIE);
