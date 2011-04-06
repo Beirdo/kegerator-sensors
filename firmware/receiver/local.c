@@ -23,6 +23,7 @@ uint8_t sensor_handle_set( message *msg )
 uint8_t sensor_handle_get( message *msg )
 {
     uint8_t offset;
+    uint16_t value;
 
     switch( msg->subaddress )
     {
@@ -41,7 +42,9 @@ uint8_t sensor_handle_get( message *msg )
         case 1:     /* Temperature sensor over I2C */
             u_tx_size = 8;
             memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
-            *(uint16_t *)&(u_tx_buf[4]) = tcn75a_read(0);
+            value = tcn75a_read(0);
+            u_tx_buf[4] = (value >> 8);
+            u_tx_buf[5] = (value & 0xFF);
             break;
         default:
             return( 0 );
