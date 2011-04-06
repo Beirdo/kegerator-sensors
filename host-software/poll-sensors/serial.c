@@ -44,7 +44,6 @@ int serial_write( uint8_t *buf, int len )
 
     buffer_dump( "Sent: ", buf, len );
     crc = calc_crc(buf, len);
-    printf( "CRC %04X\n", crc );
 
     return( write( write_fd, buf, len ) );
 }
@@ -72,8 +71,6 @@ int serial_read( uint8_t *buf, int maxlen )
         if( len <= 0 ) 
             return( len );
 
-buffer_dump( "Rx: ", buf, len );
-
         buf    += len;
         totlen += len;
     }
@@ -91,8 +88,6 @@ buffer_dump( "Rx: ", buf, len );
         len = read( read_fd, buf, pktlen-totlen );
         if( len <= 0 ) 
             return( len );
-
-buffer_dump( "Rx: ", buf, len );
 
         buf    += len;
         totlen += len;

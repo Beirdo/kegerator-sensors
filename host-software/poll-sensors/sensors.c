@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 #include <sys/time.h>
 #include "local.h"
 
@@ -162,31 +163,46 @@ void sensor_poll(void)
             case S_RECEIVER:
                 len = sensor_send( buf, MAX_BUF_LEN, sensors[i].address, 0, 1, 
                                    NULL, 0 );
-                if( len > 0 )
+                if( len > 0 ) 
+                {
+                    buffer_dump("Received: ", buf, len);
                     sensor_handle( S_RECEIVER, buf );
+                }
                 break;
             case S_ACCELEROMETER:
                 len = sensor_send( buf, MAX_BUF_LEN, sensors[i].address, 0, 1, 
                                    NULL, 0 );
                 if( len > 0 )
+                {
+                    buffer_dump("Received: ", buf, len);
                     sensor_handle( S_ACCELEROMETER, buf );
+                }
 
                 len = sensor_send( buf, MAX_BUF_LEN, sensors[i].address, 0, 2, 
                                    NULL, 0 );
                 if( len > 0 )
+                {
+                    buffer_dump("Received: ", buf, len);
                     sensor_handle( S_ACCELEROMETER, buf );
+                }
                 break;
             case S_MASS:
                 len = sensor_send( buf, MAX_BUF_LEN, sensors[i].address, 0, 1, 
                                    NULL, 0 );
                 if( len > 0 )
+                {
+                    buffer_dump("Received: ", buf, len);
                     sensor_handle( S_MASS, buf );
+                }
                 break;
             case S_TEMPERATURE:
                 len = sensor_send( buf, MAX_BUF_LEN, sensors[i].address, 0, 1, 
                                    NULL, 0 );
                 if( len > 0 )
+                {
+                    buffer_dump("Received: ", buf, len);
                     sensor_handle( S_TEMPERATURE, buf );
+                }
                 break;
             default:
                 break;
@@ -196,8 +212,8 @@ void sensor_poll(void)
 
 void sensor_handle( sensor_t type, uint8_t *buf )
 {
-    char template[] = BASEDIR "/sensor_%01X_%1d.rrd";
-    char filename[] = BASEDIR "/sensor_X_X.rrd";
+    char template[] = BASEDIR "/sensor_%02X_%1d.rrd";
+    char filename[] = BASEDIR "/sensor_XX_X.rrd";
     message *msg;
     int len;
     FILE *fp;
@@ -207,6 +223,7 @@ void sensor_handle( sensor_t type, uint8_t *buf )
     float temperature;
     int i;
     int j;
+    int sign;
 
     msg = (message *)buf;
 
@@ -216,8 +233,10 @@ void sensor_handle( sensor_t type, uint8_t *buf )
     gettimeofday(&tv, NULL);
 
     fp = fopen( filename, "a" );
-    if( !fp )
+    if( !fp ) {
+        printf("Error opening %s: %s", filename, strerror(errno));
         return;
+    }
 
     switch( type )
     {
@@ -225,15 +244,18 @@ void sensor_handle( sensor_t type, uint8_t *buf )
         case S_TEMPERATURE:
             if( len < 2 )
                 return;
-            word = (msg->data[0] << 8) | msg->data[1];
-            temperature = ((float)word) / 256.0;
+            word = ((msg->data[0] & 0x7F) << 8) | msg->data[1];
+            sign = (msg->data[0] & 0x80 ? -1 : 1);
+            temperature = sign * ((float)word) / 256.0;
             fprintf(fp, "%ld,%7.3f\n", tv.tv_sec, temperature);
+            printf("%ld,%7.3f\n", tv.tv_sec, temperature);
             break;
         case S_MASS:
             if( len < 2 )
                 return;
             word = (msg->data[0] << 8) | msg->data[1];
             fprintf(fp, "%ld,%d\n", tv.tv_sec, word);
+            printf("%ld,%d\n", tv.tv_sec, word);
             break;
         case S_ACCELEROMETER:
             if( len < 10 )
@@ -245,6 +267,7 @@ void sensor_handle( sensor_t type, uint8_t *buf )
                 dword |= msg->data[i];
             }
             fprintf(fp, "%ld,", (long int)dword);
+            printf("%ld,", (long int)dword);
             for( i = 0; i < 3; i++ ) {
                 word = 0;
                 for( j = 0; j < 2; j++ ) {
@@ -252,8 +275,10 @@ void sensor_handle( sensor_t type, uint8_t *buf )
                     word |= msg->data[4+(i*2)+j];
                 }
                 fprintf(fp, "%d,", word );
+                printf("%d,", word );
             }
             fprintf(fp, "\n");
+            printf("\n");
             break;
         default:
             break;
