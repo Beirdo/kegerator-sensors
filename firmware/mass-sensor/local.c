@@ -26,10 +26,10 @@ uint8_t sensor_handle_set( message *msg )
             if( sensor_size < 8 )
                 return( 0 );
 
-            adc_tare_grams = *(uint16_t *)msg->data;
+            adc_tare_grams = (msg->data[0] << 8) | msg->data[1];
             eeprom_update_word( &ee_adc_tare_grams, adc_tare_grams );
             u_tx_size = 7;
-            memcpy(u_tx_buf, sensor_buf, 4);
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             u_tx_buf[4] = 1;
             break;
         case 2:     /* RDAC1 from AD5252 via I2C */
@@ -38,7 +38,7 @@ uint8_t sensor_handle_set( message *msg )
 
             ad5252_set_rdac(1, msg->data[0]);
             u_tx_size = 7;
-            memcpy(u_tx_buf, sensor_buf, 4);
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             u_tx_buf[4] = 1;
             break;
         case 3:     /* RDAC2 from AD5252 via I2C */
@@ -47,27 +47,27 @@ uint8_t sensor_handle_set( message *msg )
 
             ad5252_set_rdac(3, msg->data[0]);
             u_tx_size = 7;
-            memcpy(u_tx_buf, sensor_buf, 4);
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             u_tx_buf[4] = 1;
             break;
         case 4:     /* Zero offset of ADC reading */
             if( sensor_size < 8 )
                 return( 0 );
 
-            adc_zero_offset = *(uint16_t *)msg->data;
+            adc_zero_offset = (msg->data[0] << 8) | msg->data[1];
             eeprom_update_word( &ee_adc_zero_offset, adc_zero_offset );
             u_tx_size = 7;
-            memcpy(u_tx_buf, sensor_buf, 4);
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             u_tx_buf[4] = 1;
             break;
         case 5:     /* Inverse slope of ADC readings */
             if( sensor_size < 8 )
                 return( 0 );
 
-            adc_inverse_slope = *(uint16_t *)msg->data;
+            adc_inverse_slope = (msg->data[0] << 8) | msg->data[1];
             eeprom_update_word( &ee_adc_inverse_slope, adc_inverse_slope );
             u_tx_size = 7;
-            memcpy(u_tx_buf, sensor_buf, 4);
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             u_tx_buf[4] = 1;
             break;
         default:
@@ -80,13 +80,14 @@ uint8_t sensor_handle_set( message *msg )
 uint8_t sensor_handle_get( message *msg )
 {
     uint8_t offset;
+    uint16_t value;
 
     switch( msg->subaddress )
     {
         case 0:     /* Firmware version */
             u_tx_size = 7 + strlen((char *)sensor_fw_version) + 
                         strlen((char *)sensor_type);
-            memcpy(u_tx_buf, sensor_buf, 4);
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             offset = 4;
             memcpy(&(u_tx_buf[offset]), sensor_type, 
                    strlen((char *)sensor_type));
@@ -97,17 +98,19 @@ uint8_t sensor_handle_get( message *msg )
             break;
         case 1:     /* Mass in g via ADC */
             u_tx_size = 8;
-            memcpy(u_tx_buf, sensor_buf, 4);
-            *(uint16_t *)&(u_tx_buf[4]) = adc_read();
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
+            value = adc_read();
+            u_tx_buf[4] = value >> 8;
+            u_tx_buf[5] = value & 0xFF;
             break;
         case 2:     /* RDAC1 from AD5252 via I2C */
             u_tx_size = 7;
-            memcpy(u_tx_buf, sensor_buf, 4);
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             u_tx_buf[4] = ad5252_get_rdac(1);
             break;
         case 3:     /* RDAC2 from AD5252 via I2C */
             u_tx_size = 7;
-            memcpy(u_tx_buf, sensor_buf, 4);
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             u_tx_buf[4] = ad5252_get_rdac(3);
             break;
         default:
