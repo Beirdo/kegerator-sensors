@@ -6,26 +6,25 @@
 #include <string.h>
 #include <util/twi.h>
 
-typedef enum {
-    TW_MASTER_TX,
-    TW_MASTER_RX,
-    TW_SLAVE_TX,
-    TW_SLAVE_RX
-} i2c_mode_t;
+#define TW_MASTER_TX    0
+#define TW_MASTER_RX    1
+#define TW_SLAVE_TX     2
+#define TW_SLAVE_RX     3
 
-typedef enum {
-    I2C_START,
-    I2C_SEND_ADDR,
-    I2C_SEND_DATA,
-    I2C_RECEIVE_DATA,
-    I2C_STOP,
-    I2C_DONE,
-    I2C_ERROR
-} i2c_state_t;
+typedef uint8_t i2c_mode_t;
+
+#define I2C_START           0
+#define I2C_SEND_ADDR       1
+#define I2C_SEND_DATA       2
+#define I2C_RECEIVE_DATA    3
+#define I2C_STOP            4
+#define I2C_ERROR           5
+
+typedef uint8_t i2c_state_t;
 
 
-i2c_state_t i2c_state;
-i2c_mode_t i2c_mode;
+volatile i2c_state_t i2c_state;
+volatile i2c_mode_t i2c_mode;
 uint8_t i2c_slaveaddr;
 uint8_t i2c_tx_data[MAX_BUF_LEN];
 uint8_t i2c_tx_index;
@@ -36,11 +35,14 @@ uint8_t i2c_rx_size;
 uint8_t i2c_chain;
 uint8_t i2c_twcr_val;
 
+void i2c_wait( void );
+
 void i2c_setup(void)
 {
     TWSR = 0;       /* No prescaling, please */
-    TWBR = 8;       /* 100kHz I2C clock */
+    TWBR = 2;       /* 400kHz I2C clock (32 for 100kHz) */
     i2c_twcr_val = (1 << TWINT) | (1 << TWEN) | (1 << TWIE);
+    TWCR = i2c_twcr_val & ~(1 << TWIE);
 }
 
 void i2c_write_8bit( uint8_t addr, uint8_t data )
@@ -72,10 +74,7 @@ void i2c_write_buffer( uint8_t addr, uint8_t *buffer, uint8_t bytes )
 
     TWCR = i2c_twcr_val | (1 << TWSTA);
 
-    while( i2c_state != I2C_DONE && i2c_state != I2C_ERROR )
-    {
-        sleep_mode();
-    }
+    i2c_wait();
 }
 
 uint8_t i2c_read_8bit_chained( uint8_t addr, uint8_t subaddr )
@@ -101,10 +100,7 @@ void i2c_read_buffer_chained( uint8_t addr, uint8_t subaddr, uint8_t *buffer,
 
     TWCR = i2c_twcr_val | (1 << TWSTA);
 
-    while( i2c_state != I2C_DONE && i2c_state != I2C_ERROR )
-    {
-        sleep_mode();
-    }
+    i2c_wait();
 
     if( buffer != i2c_rx_data )
         memcpy( buffer, i2c_rx_data, bytes );
@@ -138,10 +134,7 @@ void i2c_read_buffer( uint8_t addr, uint8_t *buffer, uint8_t bytes )
 
     TWCR = i2c_twcr_val | (1 << TWSTA);
 
-    while( i2c_state != I2C_DONE && i2c_state != I2C_ERROR )
-    {
-        sleep_mode();
-    }
+    i2c_wait();
 
     if( buffer != i2c_rx_data )
         memcpy( buffer, i2c_rx_data, bytes );
@@ -196,17 +189,13 @@ void i2c_master_tx_do_state(void)
                 else
                 {
                     i2c_state = I2C_STOP;
-                    TWCR = i2c_twcr_val | (1 << TWSTO);
+                    TWCR = (i2c_twcr_val | (1 << TWSTO)) & ~(1 << TWIE);
                 }
             }
             else
             {
                 i2c_state = I2C_ERROR;
             }
-            break;
-        case I2C_STOP:
-            i2c_state = I2C_DONE;
-            TWCR = i2c_twcr_val & ~(1 << TWIE);
             break;
         default:
             i2c_state = I2C_ERROR;
@@ -243,8 +232,7 @@ void i2c_master_rx_do_state(void)
             {
                 i2c_state = I2C_RECEIVE_DATA;
                 i2c_rx_index = 0;
-                i2c_rx_data[i2c_rx_index++] = TWDR;
-                if( (i2c_rx_size--) == 1 )
+                if( (i2c_rx_size) == 1 )
                     TWCR = i2c_twcr_val;
                 else
                     TWCR = i2c_twcr_val | (1 << TWEA);
@@ -254,8 +242,8 @@ void i2c_master_rx_do_state(void)
                 i2c_state = I2C_ERROR;
             }
             break;
-        case I2C_SEND_DATA:
-            if( twst == TW_MR_DATA_ACK )
+        case I2C_RECEIVE_DATA:
+            if( twst == TW_MR_DATA_ACK || twst == TW_MR_DATA_NACK )
             {
                 if( i2c_rx_size )
                 {
@@ -268,17 +256,13 @@ void i2c_master_rx_do_state(void)
                 else
                 {
                     i2c_state = I2C_STOP;
-                    TWCR = i2c_twcr_val | (1 << TWSTO);
+                    TWCR = (i2c_twcr_val | (1 << TWSTO)) & ~(1 << TWIE);
                 }
             }
             else
             {
                 i2c_state = I2C_ERROR;
             }
-            break;
-        case I2C_STOP:
-            i2c_state = I2C_DONE;
-            TWCR = i2c_twcr_val & ~(1 << TWIE);
             break;
         default:
             i2c_state = I2C_ERROR;
@@ -303,8 +287,16 @@ ISR(SIG_2WIRE_SERIAL)
             break;
         default:
             i2c_state = I2C_ERROR;
-            TWCR = 0;
+            TWCR = (i2c_twcr_val | (1 << TWSTO)) & ~(1 << TWIE);
             return;
+    }
+}
+
+void i2c_wait( void )
+{
+    while( i2c_state < I2C_STOP )
+    {
+        sleep_mode();
     }
 }
 
