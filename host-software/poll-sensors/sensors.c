@@ -4,7 +4,7 @@
 #include <sys/time.h>
 #include "local.h"
 
-#define BASEDIR "/opt/poll-sensor/rrds"
+#define BASEDIR "/opt/poll-sensor/data"
 
 typedef struct {
     sensor_t    type;
@@ -212,8 +212,8 @@ void sensor_poll(void)
 
 void sensor_handle( sensor_t type, uint8_t *buf )
 {
-    char template[] = BASEDIR "/sensor_%02X_%1d.rrd";
-    char filename[] = BASEDIR "/sensor_XX_X.rrd";
+    char template[] = BASEDIR "/sensor_%02X_%1d.dat";
+    char filename[] = BASEDIR "/sensor_XX_X.dat";
     message *msg;
     int len;
     FILE *fp;
@@ -247,15 +247,15 @@ void sensor_handle( sensor_t type, uint8_t *buf )
             word = ((msg->data[0] & 0x7F) << 8) | msg->data[1];
             sign = (msg->data[0] & 0x80 ? -1 : 1);
             temperature = sign * ((float)word) / 256.0;
-            fprintf(fp, "%ld,%7.3f\n", tv.tv_sec, temperature);
-            printf("%ld,%7.3f\n", tv.tv_sec, temperature);
+            fprintf(fp, "%ld %7.3f\n", tv.tv_sec, temperature);
+            printf("%ld %7.3f\n", tv.tv_sec, temperature);
             break;
         case S_MASS:
             if( len < 2 )
                 return;
             word = (msg->data[0] << 8) | msg->data[1];
-            fprintf(fp, "%ld,%d\n", tv.tv_sec, word);
-            printf("%ld,%d\n", tv.tv_sec, word);
+            fprintf(fp, "%ld %d\n", tv.tv_sec, word);
+            printf("%ld %d\n", tv.tv_sec, word);
             break;
         case S_ACCELEROMETER:
             if( len < 10 )
@@ -266,16 +266,16 @@ void sensor_handle( sensor_t type, uint8_t *buf )
                 dword <<= 8;
                 dword |= msg->data[i];
             }
-            fprintf(fp, "%ld,", (long int)dword);
-            printf("%ld,", (long int)dword);
+            fprintf(fp, "%ld ", (long int)dword);
+            printf("%ld ", (long int)dword);
             for( i = 0; i < 3; i++ ) {
                 word = 0;
                 for( j = 0; j < 2; j++ ) {
                     word <<= 8;
                     word |= msg->data[4+(i*2)+j];
                 }
-                fprintf(fp, "%d,", word );
-                printf("%d,", word );
+                fprintf(fp, "%d ", word );
+                printf("%d ", word );
             }
             fprintf(fp, "\n");
             printf("\n");
