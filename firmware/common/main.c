@@ -25,6 +25,7 @@ int main(void)
     cli();
 
     uart_setup();
+    timer_setup();
     i2c_setup();
     sensor_main_setup();
 

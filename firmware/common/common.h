@@ -37,6 +37,7 @@ extern uint8_t u_tx_size;
 void uart_setup(void);
 void uart_transmit(uint8_t target);
 void uart_restart_rx(void);
+void uart_rx_timeout(void);
 
 uint16_t check_crc( uint8_t *buffer, uint8_t length );
 uint16_t calc_crc( uint8_t *buffer, uint8_t length );
@@ -60,6 +61,11 @@ uint8_t i2c_read_8bit_chained( uint8_t addr, uint8_t subaddr );
 void i2c_read_buffer_chained( uint8_t addr, uint8_t subaddr, uint8_t *buffer,
                               uint8_t bytes );
 void i2c_read_buffer( uint8_t addr, uint8_t *buffer, uint8_t bytes );
+
+void timer_setup(void);
+void timer_enable(void);
+void timer_disable(void);
+
 
 #endif
 

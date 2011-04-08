@@ -40,10 +40,20 @@ void uart_setup(void)
     u_tx_index = 0;
 }
 
+void uart_rx_timeout(void)
+{
+    timer_disable();
+    u_rx_index = 0;
+    UCSRA = ucsra_val;
+}
+
+
 /* UART Rx interrupt */
 ISR(SIG_UART_RECV)
 {
     uint8_t byte = 0;
+
+    timer_enable();
 
     if( (UCSRA & (1 << MPCM)) ) {
         /* Wait for the address */
@@ -87,6 +97,7 @@ ISR(SIG_UART_RECV)
             }
         }
         u_rx_index = 0;
+        UCSRA = ucsra_val;
     }
 }
 
@@ -139,6 +150,7 @@ void uart_restart_rx(void)
         dummy = UDR;
 
     u_rx_index = 0;
+    UCSRA = ucsra_val;
 
     /* Reenable RX interrupts */
     UCSRB |= (1 << RXCIE);

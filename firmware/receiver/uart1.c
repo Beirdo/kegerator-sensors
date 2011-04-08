@@ -40,10 +40,20 @@ void uart1_setup(void)
     u1_tx_index = 0;
 }
 
+void uart_rx_timeout(void)
+{
+    timer_disable();
+    u1_rx_index = 0;
+    UCSR1A = ucsr1a_val;
+}
+
+
 /* UART1 Rx interrupt */
 ISR(SIG_UART1_RECV)
 {
     uint8_t byte = 0;
+
+    timer_enable();
 
     if( (UCSR1A & (1 << MPCM)) ) {
         /* Wait for the address */
@@ -83,6 +93,7 @@ ISR(SIG_UART1_RECV)
             uart_transmit(0xFF);
         }
         u1_rx_index = 0;
+        UCSR1A = ucsr1a_val;
     }
 }
 
