@@ -7,6 +7,7 @@ uint8_t sensor_type[] = "receiver";
 void sensor_main_setup(void)
 {
     sensor_address = 0xFF;
+    timer3_setup();
 }
 
 void sensor_local_setup(void)

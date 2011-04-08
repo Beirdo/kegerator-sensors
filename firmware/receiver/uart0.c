@@ -40,10 +40,19 @@ void uart0_setup(void)
     u_tx_index = 0;
 }
 
+void uart0_rx_timeout(void)
+{
+    timer3_disable();
+    u_rx_index = 0;
+}
+
+
 /* UART0 Rx interrupt */
 ISR(SIG_UART0_RECV)
 {
     uint8_t byte;
+
+    timer3_enable();
 
     byte = UDR0;
     if( u_rx_index >= u_rx_size )
