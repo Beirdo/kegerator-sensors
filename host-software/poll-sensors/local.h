@@ -35,6 +35,8 @@ uint8_t *sensor_version_find(uint8_t *string, int len);
 void sensor_poll(void);
 void sensor_handle( sensor_t type, uint8_t *buf );
 void buffer_dump(char *pre, uint8_t *buf, int len);
+int sensor_probe( uint8_t *buf, int maxlen, int address, int subaddr, 
+                  sensor_t type );
 
 #endif
 

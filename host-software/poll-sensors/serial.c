@@ -11,26 +11,29 @@
 
 #define SERIAL_PORT	"/dev/kegerator"
 
-int read_fd  = -1;
-int write_fd = -1;
+int serial_fd = -1;
 
 int serial_setup(void)
 {
     struct termios pTermios;
 
-    read_fd  = open( SERIAL_PORT, O_RDWR );
-    write_fd = read_fd; /* open( SERIAL_PORT, O_WRONLY ); */
+    if( serial_fd != -1 )
+    {
+        serial_fd = -1;
+        close( serial_fd );
+    }
 
-    printf( "Using %s: read fd %d, write fd %d\n", SERIAL_PORT, read_fd, write_fd);
+    serial_fd  = open( SERIAL_PORT, O_RDWR );
+
+    printf( "Using %s: fd %d\n", SERIAL_PORT, serial_fd );
 
     cfmakeraw( &pTermios );
     cfsetospeed( &pTermios, B38400 );
     cfsetispeed( &pTermios, 0 );
 
-    tcsetattr( read_fd,  TCSANOW, &pTermios );
-    tcsetattr( write_fd, TCSANOW, &pTermios );
+    tcsetattr( serial_fd,  TCSANOW, &pTermios );
 
-    return( (read_fd <= 0) || (write_fd <= 0) );
+    return( (serial_fd <= 0) );
 }
 
 int serial_write( uint8_t *buf, int len )
@@ -45,7 +48,7 @@ int serial_write( uint8_t *buf, int len )
     buffer_dump( "Sent: ", buf, len );
     crc = calc_crc(buf, len);
 
-    return( write( write_fd, buf, len ) );
+    return( write( serial_fd, buf, len ) );
 }
 
 int serial_read( uint8_t *buf, int maxlen )
@@ -57,17 +60,18 @@ int serial_read( uint8_t *buf, int maxlen )
     uint8_t *bufptr = buf;
     fd_set fds;
     struct timeval tv;
+    int retval;
 
     tv.tv_sec = 2;
     tv.tv_usec = 0;
 
     while( totlen < 2 )
     {
-        FD_SET(read_fd, &fds);
-        if( select( read_fd+1, &fds, NULL, NULL, &tv ) <= 0 )
-            return( -1 );
+        FD_SET(serial_fd, &fds);
+        if( (retval = select( serial_fd+1, &fds, NULL, NULL, &tv )) <= 0 )
+            return( retval );
 
-        len = read( read_fd, buf, 2-totlen );
+        len = read( serial_fd, buf, 2-totlen );
         if( len <= 0 ) 
             return( len );
 
@@ -81,11 +85,11 @@ int serial_read( uint8_t *buf, int maxlen )
 
     while( totlen < pktlen )
     {
-        FD_SET(read_fd, &fds);
-        if( select( read_fd+1, &fds, NULL, NULL, &tv ) <= 0 )
-            return( -1 );
+        FD_SET(serial_fd, &fds);
+        if( (retval = select( serial_fd+1, &fds, NULL, NULL, &tv )) <= 0 )
+            return( retval );
 
-        len = read( read_fd, buf, pktlen-totlen );
+        len = read( serial_fd, buf, pktlen-totlen );
         if( len <= 0 ) 
             return( len );
 

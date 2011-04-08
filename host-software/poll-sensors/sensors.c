@@ -9,14 +9,15 @@
 typedef struct {
     sensor_t    type;
     char       *string;
+    int         maxsubaddr;
 } sensor_map_t;
 
 sensor_map_t sensorMap[] = {
-    { S_UNKNOWN,       "unknown" },
-    { S_RECEIVER,      "receiver" },
-    { S_ACCELEROMETER, "accelerometer" },
-    { S_MASS,          "mass" },
-    { S_TEMPERATURE,   "temperature" }
+    { S_UNKNOWN,       "unknown",       1 },
+    { S_RECEIVER,      "receiver",      1 },
+    { S_ACCELEROMETER, "accelerometer", 2 },
+    { S_MASS,          "mass",          1 },
+    { S_TEMPERATURE,   "temperature",   1 }
 };
 int sensorMapCount = sizeof(sensorMap) / sizeof(sensorMap[0]);
 
@@ -57,7 +58,7 @@ int sensor_setup(void)
         if( i == 16 )
             i = 255;
 
-        printf("Setup Poll - Sensor Address 0x%02X\n", i);
+        printf("\nSetup Poll - Sensor Address 0x%02X\n", i);
         len = sensor_send( buf, MAX_BUF_LEN, i, 0, 0, NULL, 0 );
         if( len > 0 )
         {
@@ -75,6 +76,11 @@ int sensor_setup(void)
                 index++;
                 sensor_count++;
             }
+        } 
+        else if ( len < 0 )
+        {
+            i--;
+            serial_setup();
         }
     }
 
@@ -108,7 +114,7 @@ void buffer_dump(char *pre, uint8_t *buf, int len)
     for( i = 0; i < len; i++ )
     {
         if( i % 16 == 0 ) {
-            printf( "\n%s", pre );
+            printf( "%s%s", (i ? "\n" : ""), pre );
         }
 
         printf( "%02X ", buf[i] );
@@ -154,60 +160,50 @@ void sensor_poll(void)
 {
     uint8_t buf[MAX_BUF_LEN];
     int i;
+    int j;
     int len;
+    int maxsubaddr;
 
     for( i = 0; i < sensor_count; i++ )
     {
-        switch( sensors[i].type )
+        if( sensors[i].type >= S_RECEIVER && sensors[i].type <= S_TEMPERATURE )
         {
-            case S_RECEIVER:
-                len = sensor_send( buf, MAX_BUF_LEN, sensors[i].address, 0, 1, 
-                                   NULL, 0 );
-                if( len > 0 ) 
+            maxsubaddr = sensorMap[sensors[i].type].maxsubaddr;
+            for( j = 1; j <= maxsubaddr; j++ )
+            {
+                len = sensor_probe( buf, MAX_BUF_LEN, sensors[i].address, j, 
+                                    sensors[i].type );
+                if( len < 0 )
                 {
-                    buffer_dump("Received: ", buf, len);
-                    sensor_handle( S_RECEIVER, buf );
+                    j--;
+                    continue;
                 }
-                break;
-            case S_ACCELEROMETER:
-                len = sensor_send( buf, MAX_BUF_LEN, sensors[i].address, 0, 1, 
-                                   NULL, 0 );
-                if( len > 0 )
-                {
-                    buffer_dump("Received: ", buf, len);
-                    sensor_handle( S_ACCELEROMETER, buf );
-                }
-
-                len = sensor_send( buf, MAX_BUF_LEN, sensors[i].address, 0, 2, 
-                                   NULL, 0 );
-                if( len > 0 )
-                {
-                    buffer_dump("Received: ", buf, len);
-                    sensor_handle( S_ACCELEROMETER, buf );
-                }
-                break;
-            case S_MASS:
-                len = sensor_send( buf, MAX_BUF_LEN, sensors[i].address, 0, 1, 
-                                   NULL, 0 );
-                if( len > 0 )
-                {
-                    buffer_dump("Received: ", buf, len);
-                    sensor_handle( S_MASS, buf );
-                }
-                break;
-            case S_TEMPERATURE:
-                len = sensor_send( buf, MAX_BUF_LEN, sensors[i].address, 0, 1, 
-                                   NULL, 0 );
-                if( len > 0 )
-                {
-                    buffer_dump("Received: ", buf, len);
-                    sensor_handle( S_TEMPERATURE, buf );
-                }
-                break;
-            default:
-                break;
+            }
         }
     }
+}
+
+int sensor_probe( uint8_t *buf, int maxlen, int address, int subaddr, 
+                  sensor_t type )
+{
+    int len;
+
+    printf( "\nPolling %s sensor %02X, subaddr %d\n", sensorMap[type].string,
+            address, subaddr );
+
+    len = sensor_send( buf, maxlen, address, 0, subaddr, NULL, 0 );
+    if( len > 0 )
+    {
+        buffer_dump("Received: ", buf, len);
+        sensor_handle( type, buf );
+        printf("\n");
+    }
+    else if( len < 0 )
+    {
+        serial_setup();
+    }
+
+    return( len );
 }
 
 void sensor_handle( sensor_t type, uint8_t *buf )
