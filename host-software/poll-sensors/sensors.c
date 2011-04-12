@@ -240,8 +240,8 @@ void sensor_handle( sensor_t type, uint8_t *buf )
         case S_TEMPERATURE:
             if( len < 2 )
                 return;
-            word = ((msg->data[0] & 0x7F) << 8) | msg->data[1];
             sign = (msg->data[0] & 0x80 ? -1 : 1);
+            word = sign * ((msg->data[0] << 8) | msg->data[1]);
             temperature = sign * ((float)word) / 256.0;
             fprintf(fp, "%ld %7.3f\n", tv.tv_sec, temperature);
             printf("%ld %7.3f\n", tv.tv_sec, temperature);
