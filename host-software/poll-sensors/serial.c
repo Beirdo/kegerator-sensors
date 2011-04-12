@@ -61,6 +61,7 @@ int serial_read( uint8_t *buf, int maxlen )
     fd_set fds;
     struct timeval tv;
     int retval;
+    uint16_t crc;
 
     tv.tv_sec = 2;
     tv.tv_usec = 0;
@@ -97,8 +98,11 @@ int serial_read( uint8_t *buf, int maxlen )
         totlen += len;
     }
 
-    if( check_crc(bufptr, totlen) )
+    if( (crc = check_crc(bufptr, totlen)) )
+    {
+        printf("CRC Error: %04X\n", crc );
         return( -1 );
+    }
 
     return( totlen );
 }
