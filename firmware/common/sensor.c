@@ -51,11 +51,11 @@ void sensor_handle(void)
     }
 
     u_tx_buf[1] = u_tx_size;
-    memset(&(u_tx_buf[u_tx_size-2]), 0x00, 2);
 
     crc = calc_crc( u_tx_buf, u_tx_size-2 );
 
-    *(uint16_t *)&(u_tx_buf[u_tx_size-2]) = crc;
+    u_tx_buf[u_tx_size-2] = (crc & 0xFF);
+    u_tx_buf[u_tx_size-1] = (crc >> 8);
 
     uart_transmit();
     uart_restart_rx();

@@ -140,7 +140,7 @@ void uart_restart_rx(void)
     uint8_t dummy;
 
     /* Drain the RX register */
-    while( UCSR0A && (1 << RXC) )
+    while( UCSR0A & (1 << RXC) )
         dummy = UDR0;
 
     u_rx_index = 0;

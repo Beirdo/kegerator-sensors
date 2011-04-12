@@ -43,8 +43,8 @@ uint8_t sensor_handle_get( message *msg )
             u_tx_size = 8;
             memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             value = tcn75a_read(0);
-            u_tx_buf[4] = value >> 8;
-            u_tx_buf[5] = value & 0xFF;
+            u_tx_buf[4] = (value >> 8);
+            u_tx_buf[5] = (value & 0xFF);
             break;
         default:
             return( 0 );

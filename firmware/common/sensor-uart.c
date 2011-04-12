@@ -58,6 +58,7 @@ ISR(SIG_UART_RECV)
     timer_enable();
 #endif
 
+    byte = UCSRB;
     byte = UDR;
 
     if( (UCSRA & (1 << MPCM)) ) {
@@ -148,7 +149,7 @@ void uart_restart_rx(void)
     uint8_t dummy;
 
     /* Drain the RX register */
-    while( UCSRA && (1 << RXC) )
+    while( UCSRA & (1 << RXC) ) 
         dummy = UDR;
 
     u_rx_index = 0;
