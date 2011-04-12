@@ -8,6 +8,10 @@
 #define BAUD 38400
 #include <util/setbaud.h>
 
+#ifndef URSEL
+#define URSEL 7
+#endif
+
 uint8_t u_rx_buf[MAX_BUF_LEN];
 uint8_t u_rx_index;
 uint8_t u_rx_size;
@@ -33,7 +37,7 @@ void uart0_setup(void)
 #endif
 
     UCSR0B = (1 << RXCIE) | (1 << RXEN) | (1 << TXEN);
-    UCSR0C = (3 << UCSZ0);                  /* N81 */
+    UCSR0C = (1 << URSEL) | (3 << UCSZ0);                  /* N81 */
 
     u_rx_index = 0;
     u_rx_size  = MAX_BUF_LEN;
@@ -52,7 +56,9 @@ ISR(SIG_UART0_RECV)
 {
     uint8_t byte;
 
+#if 0
     timer3_enable();
+#endif
 
     byte = UDR0;
     if( u_rx_index >= u_rx_size )
@@ -88,13 +94,9 @@ ISR(SIG_UART0_RECV)
             else
             {
                 /* Transmit it to the BLVDS */
-                uint8_t target;
-
-                target = u_rx_buf[0];
                 u1_tx_size = u_rx_size;
-                u_rx_buf[0] = sensor_address;  /* Return address */
                 memcpy(u1_tx_buf, u_rx_buf, u1_tx_size);
-                uart1_transmit(target);
+                uart1_transmit();
             }
             u_rx_index = 0;
         }
@@ -121,10 +123,8 @@ ISR(SIG_UART0_TRANS)
     u_tx_size = 0;
 }
 
-void uart_transmit(uint8_t target)
+void uart_transmit(void)
 {
-    (void)target;
-
     u_tx_size = MIN(u_tx_size, MAX_BUF_LEN);
     if( u_tx_size )
     {

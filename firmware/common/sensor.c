@@ -57,7 +57,7 @@ void sensor_handle(void)
 
     *(uint16_t *)&(u_tx_buf[u_tx_size-2]) = crc;
 
-    uart_transmit(0xFF);
+    uart_transmit();
     uart_restart_rx();
 }
 

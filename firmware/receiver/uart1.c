@@ -8,6 +8,10 @@
 #define BAUD 38400
 #include <util/setbaud.h>
 
+#ifndef URSEL
+#define URSEL 7
+#endif
+
 uint8_t u1_rx_buf[MAX_BUF_LEN];
 uint8_t u1_rx_index;
 uint8_t u1_rx_size;
@@ -28,7 +32,7 @@ void uart1_setup(void)
     UCSR1A = ucsr1a_val;
 
     UCSR1B = (1 << RXCIE) | (1 << RXEN) | (1 << TXEN) | (1 << UCSZ2);
-    UCSR1C = (3 << UCSZ0);                  /* N91 */
+    UCSR1C = (1 << URSEL) | (3 << UCSZ0);                  /* N91 */
 
     /* Setup the enables for the BLVDS part as outputs */
     DDRD |= (1 << PD5) | (1 << PD4);
@@ -37,6 +41,7 @@ void uart1_setup(void)
     PORTD &= ~((1 << PD5) | (1 << PD4));
 
     u1_rx_index = 0;
+    u1_rx_size  = MAX_BUF_LEN;
     u1_tx_index = 0;
 }
 
@@ -53,25 +58,27 @@ ISR(SIG_UART1_RECV)
 {
     uint8_t byte = 0;
 
+#if 0
     timer_enable();
+#endif
+
+    byte = UDR1;
 
     if( (UCSR1A & (1 << MPCM)) ) {
         /* Wait for the address */
-        if( (UDR1 == sensor_address) ) {
+        if( (byte == sensor_address) ) 
+        {
             /* Allow it to read the data now */
             UCSR1A = (ucsr1a_val & ~(1 << MPCM));
         }
+        return;
     }
-    else
-    {
-        byte = UDR1;
 
-        /* We are in the data portion */
-        if( u1_rx_index < MAX_BUF_LEN )
-        {
-            u1_rx_buf[u1_rx_index++] = byte;
-        }
-    }
+    /* We are in the data portion */
+    if( u1_rx_index >= u1_rx_size )
+        return;
+
+    u1_rx_buf[u1_rx_index++] = byte;
 
     if( u1_rx_index == 2 )
     {
@@ -90,7 +97,7 @@ ISR(SIG_UART1_RECV)
             /* Transmit it to the PC over USB */
             u_tx_size = u1_rx_size;
             memcpy(u_tx_buf, u1_rx_buf, u_tx_size);
-            uart_transmit(0xFF);
+            uart_transmit();
         }
         u1_rx_index = 0;
         UCSR1A = ucsr1a_val;
@@ -122,7 +129,7 @@ ISR(SIG_UART1_TRANS)
     u1_tx_size = 0;
 }
 
-void uart1_transmit(uint8_t target)
+void uart1_transmit(void)
 {
     u1_tx_size = MIN(u1_tx_size, MAX_BUF_LEN);
     if( u1_tx_size )
@@ -132,7 +139,7 @@ void uart1_transmit(uint8_t target)
 
         u1_tx_index = 0;
         UCSR1B |= (1 << TXB8);  /* Set the address bit */
-        UDR1 = target;
+        UDR1 = u1_tx_buf[u1_tx_index++];
         UCSR1B |= (1 << TXCIE) | (1 << UDRIE);
     }
 }

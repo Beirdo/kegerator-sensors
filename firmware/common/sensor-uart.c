@@ -27,8 +27,8 @@ void uart_setup(void)
 #endif
     UCSRA = ucsra_val;
 
-    UCSRB = (1 << RXCIE) | (1 << RXEN) | (1 << TXEN) | (1 << UCSZ2);
-    UCSRC = (3 << UCSZ0);                  /* N91 */
+    UCSRB = (1 << RXCIE) | (1 << RXEN) | (1 << TXEN) | (1 << UCSZ2); 
+    UCSRC = (1 << URSEL) | (3 << UCSZ0);                  /* N91 */
 
     /* Setup the enables for the BLVDS part */
     DDRD  |= (1 << PD3) | (1 << PD2);
@@ -37,6 +37,7 @@ void uart_setup(void)
     PORTD &= ~((1 << PD3) | (1 << PD2));
 
     u_rx_index = 0;
+    u_rx_size  = MAX_BUF_LEN;
     u_tx_index = 0;
 }
 
@@ -53,25 +54,26 @@ ISR(SIG_UART_RECV)
 {
     uint8_t byte = 0;
 
+#if 0
     timer_enable();
+#endif
+
+    byte = UDR;
 
     if( (UCSRA & (1 << MPCM)) ) {
         /* Wait for the address */
-        if( (UDR == sensor_address) ) {
-            /* Allow it to read the data now */
-            UCSRA = (ucsra_val & ~(1 << MPCM));
-        }
-    }
-    else
-    {
-        byte = UDR;
+        if( byte != sensor_address )
+            return;
 
-        /* We are in the data portion */
-        if( u_rx_index < MAX_BUF_LEN )
-        {
-            u_rx_buf[u_rx_index++] = byte;
-        }
+        /* Allow it to read the data now */
+        UCSRA = (ucsra_val & ~(1 << MPCM));
     }
+
+    /* We are in the data portion */
+    if( u_rx_index >= u_rx_size )
+        return;
+
+    u_rx_buf[u_rx_index++] = byte;
 
     if( u_rx_index == 2 )
     {
@@ -126,7 +128,7 @@ ISR(SIG_UART_TRANS)
     u_tx_size = 0;
 }
 
-void uart_transmit(uint8_t target)
+void uart_transmit(void)
 {
     u_tx_size = MIN(u_tx_size, MAX_BUF_LEN);
     if( u_tx_size )
@@ -136,7 +138,7 @@ void uart_transmit(uint8_t target)
 
         u_tx_index = 0;
         UCSRB |= (1 << TXB8);  /* Set the address bit */
-        UDR = target;
+        UDR = 0xFF;
         UCSRB |= (1 << TXCIE) | (1 << UDRIE);
     }
 }

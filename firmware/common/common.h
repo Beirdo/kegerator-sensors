@@ -35,7 +35,7 @@ extern uint8_t u_tx_size;
 
 /* Prototypes */
 void uart_setup(void);
-void uart_transmit(uint8_t target);
+void uart_transmit(void);
 void uart_restart_rx(void);
 void uart_rx_timeout(void);
 
