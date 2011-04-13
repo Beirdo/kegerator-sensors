@@ -20,6 +20,7 @@ extern uint16_t adc_tare_grams;
 /* Prototypes */
 void adc_setup(void);
 uint16_t adc_read(void);
+uint16_t adc_read_raw(void);
 
 void ad5252_setup(void);
 void ad5252_set_rdac( uint8_t rdacnum, uint8_t value );

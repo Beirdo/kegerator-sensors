@@ -27,11 +27,9 @@ void adc_setup(void)
     ADCSRA = adcsra_val;
 }
 
-uint16_t adc_read(void)
+uint16_t adc_read_raw(void)
 {
     uint16_t raw;
-    uint32_t value;
-    uint16_t grams;
 
     /* Start conversion, clear old interrupt, enable interrupt */
     ADCSRA = adcsra_val | (1 << ADSC) | (1 << ADIF) | (1 << ADIE);
@@ -42,6 +40,17 @@ uint16_t adc_read(void)
     }
 
     raw = ADCL | (ADCH << 8);
+
+    return( raw );
+}
+
+uint16_t adc_read(void)
+{
+    uint16_t raw;
+    uint32_t value;
+    uint16_t grams;
+
+    raw = adc_read_raw();
 
     /* Note: adc_inverse_slope is 8.8 bits (fractional) */
     value = (raw - adc_zero_offset) * adc_inverse_slope;

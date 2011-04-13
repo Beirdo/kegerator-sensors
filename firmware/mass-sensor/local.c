@@ -113,6 +113,20 @@ uint8_t sensor_handle_get( message *msg )
             memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
             u_tx_buf[4] = ad5252_get_rdac(3);
             break;
+        case 4:     /* Raw ADC value */
+            u_tx_size = 8;
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
+            value = adc_read_raw();
+            u_tx_buf[4] = value >> 8;
+            u_tx_buf[5] = value & 0xFF;
+            break;
+        case 5:     /* Tare weight in g */
+            u_tx_size = 8;
+            memcpy(u_tx_buf, (uint8_t *)sensor_buf, 4);
+            value = adc_tare_grams;
+            u_tx_buf[4] = value >> 8;
+            u_tx_buf[5] = value & 0xFF;
+            break;
         default:
             return( 0 );
     }
