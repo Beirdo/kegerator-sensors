@@ -21,6 +21,7 @@ typedef enum {
 int serial_setup(void);
 int serial_write(uint8_t *buf, int len);
 int serial_read(uint8_t *buf, int maxlen);
+void serial_close(void);
 
 uint16_t crc16_update(uint16_t crc, uint8_t a);
 uint16_t calc_crc(uint8_t *buffer, uint8_t length);

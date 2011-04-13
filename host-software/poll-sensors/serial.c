@@ -8,6 +8,7 @@
 #include <sys/time.h>
 #include "local.h"
 #include <stdio.h>
+#include <sys/file.h>
 
 #define SERIAL_PORT	"/dev/kegerator"
 
@@ -33,7 +34,16 @@ int serial_setup(void)
 
     tcsetattr( serial_fd,  TCSANOW, &pTermios );
 
+    flock( serial_fd, LOCK_EX );
+
     return( (serial_fd <= 0) );
+}
+
+void serial_close(void)
+{
+    flock( serial_fd, LOCK_UN );
+    close( serial_fd );
+    serial_fd = -1;
 }
 
 int serial_write( uint8_t *buf, int len )

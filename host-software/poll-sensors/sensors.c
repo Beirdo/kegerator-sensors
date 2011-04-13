@@ -84,6 +84,8 @@ int sensor_setup(void)
         }
     }
 
+    serial_close();
+
     return( sensor_count );
 }
 
@@ -164,6 +166,8 @@ void sensor_poll(void)
     int len;
     int maxsubaddr;
 
+    serial_setup();
+
     for( i = 0; i < sensor_count; i++ )
     {
         if( sensors[i].type >= S_RECEIVER && sensors[i].type <= S_TEMPERATURE )
@@ -181,6 +185,8 @@ void sensor_poll(void)
             }
         }
     }
+    
+    serial_close();
 }
 
 int sensor_probe( uint8_t *buf, int maxlen, int address, int subaddr, 
